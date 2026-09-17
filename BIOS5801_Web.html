@@ -1,0 +1,2425 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BIOS5801 導論＋Iteration · R 統計計算入門_由Mason製作獻給泽欣</title>
+  <style>
+:root {
+  --ink: #1c1c1c;
+  --muted: #5c5c5c;
+  --rule: #cfc9bb;
+  --paper: #f7f4ee;
+  --card: #fffcf7;
+  --navy: #1e3a5f;
+  --accent: #1e3a5f;
+  --rblue: #245d8c;
+  --output: #e8efe6;
+  --codebg: #f3f0e8;
+  --pitfall: #7a2e3a;
+  --note: #2f5d50;
+  --key: #8a6a1f;
+  --white: #fff;
+  --sidebar: 268px;
+  --sans: "PingFang TC", "Noto Sans TC", "Source Sans 3", "Helvetica Neue", sans-serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", "Songti TC", "Noto Serif TC", serif;
+  --mono: "IBM Plex Mono", "Source Code Pro", "SF Mono", Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: var(--sans);
+  line-height: 1.8;
+}
+.topbar {
+  position: sticky; top: 0; z-index: 40;
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; padding: 10px 22px;
+  background: var(--navy); color: #f4efe6;
+  border-bottom: 1px solid #0f243d;
+}
+.brand { display: flex; gap: 12px; align-items: center; }
+.mark {
+  width: 34px; height: 34px; border: 1px solid #c9b27a;
+  display: grid; place-items: center;
+  font-family: var(--mono); font-weight: 700; font-size: 13px; color: #c9b27a;
+}
+.brand h1 { margin: 0; font-size: 13px; letter-spacing: .08em; font-weight: 600; }
+.brand p { margin: 0; font-size: 12px; color: #c5d0dc; }
+.btn {
+  border: 1px solid #c9b27a; background: transparent; color: #f4efe6;
+  padding: 6px 11px; font: 12.5px var(--sans); cursor: pointer; text-decoration: none;
+}
+.btn.solid { background: #c9b27a; color: var(--navy); border-color: #c9b27a; }
+.top-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.lang-switch {
+  display: inline-flex; border: 1px solid #c9b27a; overflow: hidden;
+}
+.lang-switch button {
+  border: 0; background: transparent; color: #f4efe6;
+  padding: 6px 10px; font: 12.5px var(--sans); cursor: pointer;
+}
+.lang-switch button[aria-pressed="true"] {
+  background: #c9b27a; color: var(--navy); font-weight: 700;
+}
+.shell { display: grid; grid-template-columns: var(--sidebar) minmax(0, 1fr); min-height: calc(100vh - 56px); }
+.sidebar {
+  position: sticky; top: 56px; height: calc(100vh - 56px); overflow: auto;
+  background: #efeae0; border-right: 1px solid var(--rule); padding: 18px 12px 40px;
+}
+.sidebar h2 {
+  margin: 0 10px 12px; font-size: 11px; letter-spacing: .16em;
+  font-family: var(--sans); color: var(--navy); font-weight: 700;
+}
+.nav .group {
+  margin: 14px 10px 4px; font-size: 11px; letter-spacing: .12em;
+  color: #6a6256; font-weight: 700;
+}
+.nav a {
+  display: block; color: #2a2a2a; text-decoration: none;
+  padding: 5px 10px; font-size: 13px; border-left: 2px solid transparent;
+}
+.nav a:hover, .nav a.active { border-left-color: var(--navy); background: rgba(30,58,95,.06); }
+.content { padding: 28px 40px 80px; max-width: 980px; counter-reset: listing unit; }
+.hero {
+  border: 1px solid var(--rule); background: var(--card); padding: 28px 30px 24px;
+}
+.kicker {
+  margin: 0 0 8px; font-size: 11px; letter-spacing: .18em; color: var(--navy); font-weight: 700;
+}
+.hero h2 {
+  font-family: var(--serif); font-size: clamp(26px, 4vw, 38px);
+  line-height: 1.28; margin: 0 0 10px; font-weight: 600;
+}
+.lede { max-width: 46em; color: #3a3a3a; margin: 0; }
+.meta { margin: 16px 0 0; font-size: 13px; color: var(--muted); }
+.legend {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px; margin-top: 18px;
+}
+.legend span {
+  display: flex; align-items: center; gap: 8px;
+  border: 1px solid var(--rule); background: #fff; padding: 7px 9px; font-size: 12px;
+}
+.swatch { width: 10px; height: 10px; flex: 0 0 10px; }
+.swatch.def { background: var(--navy); }
+.swatch.syn { background: #245d8c; }
+.swatch.ex { background: #3d5a3a; }
+.swatch.out { background: #5a7a52; }
+.swatch.walk { background: #245d8c; }
+.swatch.pit { background: var(--pitfall); }
+.swatch.key { background: var(--key); }
+.swatch.lec { background: var(--note); }
+
+section.mod {
+  margin-top: 28px; background: var(--card); border: 1px solid var(--rule);
+  padding: 24px 26px 28px; counter-increment: unit;
+}
+.mod > h2 {
+  font-family: var(--serif); margin: 0 0 8px; font-size: 24px; font-weight: 600; color: var(--navy);
+  padding-bottom: 8px; border-bottom: 1px solid var(--rule);
+}
+.mod > h2 .no {
+  display: block; font-family: var(--sans); font-size: 11px; letter-spacing: .14em;
+  color: var(--muted); margin-bottom: 6px; font-weight: 700;
+}
+.subhead { color: var(--muted); margin: 0 0 14px; }
+h3 {
+  font-family: var(--serif); color: var(--navy); font-size: 18px; font-weight: 600;
+  margin: 22px 0 8px;
+}
+h4 { margin: 12px 0 6px; font-size: 15px; }
+p { margin: 0 0 11px; }
+ul, ol { margin: 0 0 12px; padding-left: 22px; }
+li { margin: 3px 0; }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.card {
+  background: #fff; border: 1px solid var(--rule); padding: 12px 14px 14px;
+  position: relative;
+}
+.card h4 { margin-top: 4px; }
+.card::before, .snippet::before, .steps::before, .tree::before {
+  display: block; font-size: 10px; letter-spacing: .14em; font-weight: 700;
+  margin-bottom: 8px; color: var(--muted);
+}
+.card.note { border-left: 3px solid var(--note); }
+.card.note::before { content: "說明  NOTE"; color: var(--note); }
+.card.warn { border-left: 3px solid var(--pitfall); }
+.card.warn::before { content: "陷阱  PITFALL"; color: var(--pitfall); }
+.card.teacher { border-left: 3px solid var(--navy); }
+.card.teacher::before { content: "課堂  LECTURE"; color: var(--navy); }
+.card.exam { border-left: 3px solid var(--key); }
+.card.exam::before { content: "要點  KEY POINT"; color: var(--key); }
+.card.syntax { border-left: 3px solid var(--rblue); }
+.card.syntax::before { content: "語法  SYNTAX"; color: var(--rblue); }
+.card.def { border-left: 3px solid var(--navy); }
+.card.def::before { content: "定義  DEFINITION"; color: var(--navy); }
+
+.term {
+  display: inline; font-weight: 650; color: var(--navy);
+  border-bottom: 1px dotted var(--rblue);
+}
+.term::after {
+  content: "（" attr(data-zh) "）";
+  color: var(--pitfall); font-weight: 500; font-size: .86em;
+  font-family: "Songti TC", "PMingLiU", serif;
+}
+code, .mono { font-family: var(--mono); font-size: .92em; }
+
+.snippet {
+  margin: 16px 0 18px; border: 1px solid var(--rule); background: #fff;
+  counter-increment: listing;
+}
+.snippet::before {
+  content: "範例  LISTING  " counter(listing);
+  padding: 8px 12px 0; color: #3d5a3a;
+}
+.snippet .bar {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 2px 12px 8px; font-size: 13px; color: var(--ink); border-bottom: 1px solid var(--rule);
+  font-family: var(--serif);
+}
+.copy {
+  border: 1px solid var(--rule); background: #fff; color: var(--muted);
+  padding: 2px 8px; font-size: 11px; cursor: pointer; font-family: var(--sans);
+}
+.snippet pre {
+  margin: 0; padding: 10px 14px 12px; background: var(--codebg);
+  font-family: var(--mono); font-size: 13.5px; overflow: auto; line-height: 1.55; color: #1b1b1b;
+}
+.panel-lab {
+  display: block; font-size: 10px; letter-spacing: .14em; font-weight: 700;
+  padding: 8px 14px 0; color: var(--muted);
+}
+.snippet .out {
+  margin: 0; padding: 6px 14px 12px; background: var(--output);
+  font-family: var(--mono); font-size: 13px; color: #24402c;
+  border-top: 1px solid #d5ddd2; white-space: pre-wrap;
+}
+.snippet .out::before {
+  content: "輸出  OUTPUT"; display: block; font-family: var(--sans);
+  font-size: 10px; letter-spacing: .14em; font-weight: 700; color: #3d5a3a;
+  margin-bottom: 6px;
+}
+.why {
+  padding: 8px 14px 12px; background: #f7f9fc; font-size: 14.5px;
+  border-top: 1px solid var(--rule);
+}
+.why::before {
+  content: "逐步拆解  WALKTHROUGH"; display: block;
+  font-size: 10px; letter-spacing: .14em; font-weight: 700; color: var(--rblue);
+  margin-bottom: 6px;
+}
+.tok-kw { color: #7a2e3a; font-weight: 650; }
+.tok-fn { color: #1e3a5f; }
+.tok-str { color: #2f5d50; }
+.tok-num { color: #6b4a16; }
+.tok-op { color: #245d8c; }
+.tok-com { color: #7a7568; font-style: italic; }
+
+.steps { margin: 10px 0 14px; border: 1px solid var(--rule); padding: 10px 12px 12px; background: #fff; }
+.steps::before { content: "步驟  PROCEDURE"; color: var(--navy); }
+.step {
+  display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 10px;
+  padding: 8px 0;
+}
+.step .n {
+  width: 28px; height: 28px; border: 1px solid var(--navy); color: var(--navy);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 12px; font-weight: 700;
+}
+table { width: 100%; border-collapse: collapse; font-size: 14px; background: #fff; margin: 8px 0 14px; }
+th, td { border: 1px solid var(--rule); padding: 7px 9px; text-align: left; vertical-align: top; }
+th { background: var(--navy); color: #f4efe6; font-weight: 600; }
+tr:nth-child(even) td { background: #faf7f0; }
+.search {
+  width: 100%; padding: 8px 10px; border: 1px solid var(--rule);
+  font: inherit; margin-bottom: 12px; background: #fff;
+}
+.glossary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px; }
+.g-item { border: 1px solid var(--rule); padding: 10px 12px; background: #fff; }
+.g-item .en { font-weight: 700; font-family: var(--mono); font-size: 13px; }
+.g-item .zh { color: var(--pitfall); font-family: "Songti TC", serif; margin-left: 6px; }
+.q { border: 1px solid var(--rule); padding: 12px 14px; margin: 12px 0; background: #fff; }
+.q::before { content: "題目  ITEM"; display: block; font-size: 10px; letter-spacing: .14em; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+.q label { display: block; padding: 5px 6px; cursor: pointer; }
+.q label:hover { background: #f3f0e8; }
+.q .ok { background: #e4f0e2; }
+.q .bad { background: #f6e4e6; }
+.scoreboard { font-family: var(--serif); font-size: 20px; color: var(--navy); }
+.tree {
+  font-family: var(--mono); background: #fff; border: 1px solid var(--rule);
+  padding: 10px 14px 12px; line-height: 1.55; overflow: auto; font-size: 13px;
+}
+.tree::before { content: "結構  STRUCTURE"; color: var(--navy); }
+.footer {
+  color: var(--muted); font-size: 12.5px; text-align: center;
+  margin-top: 36px; border-top: 1px solid var(--rule); padding-top: 16px;
+}
+html.lang-hans .card.note::before { content: "说明  NOTE"; }
+html.lang-hans .card.warn::before { content: "陷阱  PITFALL"; }
+html.lang-hans .card.teacher::before { content: "课堂  LECTURE"; }
+html.lang-hans .card.exam::before { content: "要点  KEY POINT"; }
+html.lang-hans .card.syntax::before { content: "语法  SYNTAX"; }
+html.lang-hans .card.def::before { content: "定义  DEFINITION"; }
+html.lang-hans .snippet::before { content: "范例  LISTING  " counter(listing); }
+html.lang-hans .snippet .out::before { content: "输出  OUTPUT"; }
+html.lang-hans .why::before { content: "逐步拆解  WALKTHROUGH"; }
+html.lang-hans .steps::before { content: "步骤  PROCEDURE"; }
+html.lang-hans .tree::before { content: "结构  STRUCTURE"; }
+html.lang-hans .q::before { content: "题目  ITEM"; }
+
+@media (max-width: 980px) {
+  .shell { grid-template-columns: 1fr; }
+  .sidebar { position: relative; top: 0; height: auto; }
+  .content { padding: 16px 12px 60px; }
+}
+
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark">R</div>
+      <div>
+        <h1>BIOS5801 · Statistical Computing</h1>
+        <p>蔡明軒老師 · Introduction ＋ Iteration · 給完全初學者的課堂學習本</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <div class="lang-switch" data-no-i18n role="group" aria-label="Language">
+        <button type="button" id="lang-hant" aria-pressed="true">繁體</button>
+        <button type="button" id="lang-hans" aria-pressed="false">简体</button>
+      </div>
+      <button class="btn" id="to-top" type="button">回到頂部</button>
+      <a class="btn solid" href="#quiz">自我檢測</a>
+    </div>
+  </header>
+
+  <div class="shell">
+    <aside class="sidebar">
+      <h2>CONTENTS</h2>
+      <nav class="nav">
+        <div class="group">Part A · 導論</div>
+        <a href="#home">封面與圖例</a>
+        <a href="#zero">A1 環境：R / Console</a>
+        <a href="#course">A2 課程資訊</a>
+        <a href="#syntax">A3 語言骨架</a>
+        <div class="group">Part B · 原子資料</div>
+        <a href="#objects">B1 object：data / function</a>
+        <a href="#types">B2 type 型別</a>
+        <a href="#ops">B3 operator 運算子</a>
+        <a href="#compare">B4 比較與邏輯</a>
+        <a href="#cast">B5 typeof / is. / as.</a>
+        <a href="#vars">B6 variable 與指定</a>
+        <a href="#workspace">B7 workspace</a>
+        <div class="group">Part C · 資料結構</div>
+        <a href="#vectors">C1 vector</a>
+        <a href="#vec-arith">C2 向量運算／recycling</a>
+        <a href="#vec-fun">C3 向量函數／NA</a>
+        <a href="#which">C4 which()／names</a>
+        <a href="#arrays">C5 array</a>
+        <a href="#matrix">C6 matrix</a>
+        <a href="#lists">C7 list</a>
+        <a href="#df">C8 data.frame</a>
+        <a href="#nested">C9 巢狀結構</a>
+        <div class="group">Part D · 導論綜整</div>
+        <a href="#map">D1 結構選擇圖</a>
+        <div class="group">Part E · Iteration</div>
+        <a href="#iter-review">E1 複習地圖</a>
+        <a href="#idx-three">E2 三種索引</a>
+        <a href="#idx-int">E3 整數索引</a>
+        <a href="#idx-bool">E4 布林／名稱索引</a>
+        <a href="#control">E5 if / else / else if</a>
+        <a href="#ifelse">E6 ifelse / switch</a>
+        <a href="#bool-lazy">E7 懶惰運算 &amp;&amp; ||</a>
+        <a href="#for-loop">E8 for 迴圈</a>
+        <a href="#while-loop">E9 while / repeat</a>
+        <a href="#vectorize">E10 向量化與總結</a>
+        <div class="group">Part F · 詞彙與習題</div>
+        <a href="#glossary">F1 詞彙表</a>
+        <a href="#quiz">F2 自我檢測</a>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <section class="hero" id="home">
+        <p class="kicker">CITY UNIVERSITY OF HONG KONG · BIOS 5801</p>
+        <h2>Statistical Computing：Introduction ＋ Iteration 講義注釋_由Mason製作獻給泽欣Mua~</h2>
+        <p class="lede">本頁依蔡明軒老師導論（64 頁）與 Iteration（37 頁）編排，體例接近講義／R 說明文件。正文可切換繁體或簡體中文；程式碼為標準 R，可直接貼到 Console。目錄按主題分類：先打地基（物件、型別、向量、矩陣、list、data.frame），再進入第二講的索引、流程控制與迴圈。每一個色塊都有固定分類，請先看圖例。</p>
+        <p class="meta">語言 R　·　對象：程式初學者　·　平時 30% + 專題 30% + 期末 40%　·　Introduction 64 頁 ＋ Iteration 37 頁</p>
+        <div class="legend" aria-label="區塊分類圖例">
+          <span><i class="swatch def"></i>定義 DEFINITION</span>
+          <span><i class="swatch syn"></i>語法 SYNTAX</span>
+          <span><i class="swatch ex"></i>範例 LISTING（可複製）</span>
+          <span><i class="swatch out"></i>輸出 OUTPUT（不要輸入）</span>
+          <span><i class="swatch walk"></i>逐步拆解 WALKTHROUGH</span>
+          <span><i class="swatch pit"></i>陷阱 PITFALL</span>
+          <span><i class="swatch lec"></i>課堂 LECTURE</span>
+          <span><i class="swatch key"></i>要點 KEY POINT</span>
+        </div>
+      </section>
+
+      <!-- zero -->
+      <section class="mod" id="zero">
+        <h2><span class="no">PART A · UNIT A1</span>環境：R 與 Console</h2>
+        <p class="subhead">投影片假設你已打開 R。若你還沒裝過，先做這三步，後面每一行才打得進去。</p>
+        <div class="steps">
+          <div class="step"><div class="n">1</div><div>到 <a href="https://www.r-project.org" target="_blank" rel="noopener">r-project.org</a> 安裝 <span class="term" data-zh="R 語言本體">R</span>。它是統計計算的引擎。</div></div>
+          <div class="step"><div class="n">2</div><div>再到 <a href="https://posit.co/download/rstudio-desktop/" target="_blank" rel="noopener">RStudio</a> 安裝編輯器。課堂建議用它，因為左邊可以打指令、下面會顯示結果。</div></div>
+          <div class="step"><div class="n">3</div><div>打開 RStudio，找到標成 <b>Console</b>（主控台）的窗格。那是跟 R 對話的地方：你按 Enter，R 立刻回答。</div></div>
+        </div>
+        <div class="card teacher">
+          <strong>程式長什麼樣子。</strong>
+          一份 R 程式 = 一串<strong>指令</strong>。指令多半是：拿出一些 <span class="term" data-zh="資料">data</span>，丟進一台叫 <span class="term" data-zh="函數">function</span> 的機器，得到新的資料。投影片第 64 頁：<em>We write programs by composing functions to manipulate data.</em>
+        </div>
+        <h3>螢幕上的 <code>## [1]</code> 是什麼？</h3>
+        <p>課堂投影片把「你輸入的指令」標成紅色，把「R 的回答」寫成以 <code>##</code> 開頭。這是教學文件的慣例，意思是：下面這行不是你打的，是電腦印出來的。</p>
+        <div class="snippet">
+          <div class="bar"><span>你輸入（紅色那行）</span><button class="copy" type="button">複製</button></div>
+          <pre><code>6 + 4</code></pre>
+          <div class="out">## [1] 10</div>
+          <div class="why">
+            <strong>拆這一行輸出：</strong>
+            <code>##</code> = 這是結果，不是指令。
+            <code>[1]</code> = 這份結果從第 1 個元素開始顯示（R 把幾乎所有數字都當成向量，即使只有一個數）。
+            <code>10</code> = 真正的答案。
+          </div>
+        </div>
+        <div class="card warn"><strong>不要把 <code>## [1]</code> 打進 Console。</strong>只複製「範例 LISTING」裡的 R 程式；綠色「輸出 OUTPUT」是電腦印的，再打進去會語法錯誤。</div>
+      </section>
+
+      <section class="mod" id="course">
+        <h2><span class="no">PART A · UNIT A2</span>課程資訊</h2>
+        <div class="grid-2">
+          <article class="card">
+            <h4>BIOS 5801: Statistical Computing</h4>
+            <p>目標：掌握 R 語言的資料分析工具。</p>
+            <p>上課：星期四 19:00–21:50，YEUNG LT18。</p>
+            <p>講師：Mingxuan Cai · 辦公室 YEUNG G5-752 · office hour 星期三 19:00–20:00。</p>
+            <p>TA office hour：星期四 18:00–19:00，YEUNG G5813。</p>
+          </article>
+          <article class="card exam">
+            <h4>計分與及格線</h4>
+            <p>Homework 30% · Group project 30% · Final exam 40%（皆交 CANVAS）。</p>
+            <p>最低及格：平時（作業+專題）≥ 40%，期末 ≥ 35%。</p>
+            <p>形式：lecture + lab with exercises。</p>
+          </article>
+        </div>
+        <p>教科書：<em>R for Data Science</em>（r4ds.had.co.nz）、<em>An Introduction to Statistical Learning</em>（statlearning.com）。本講先打地基：物件、型別、向量、矩陣、list、data.frame。</p>
+      </section>
+
+      <section class="mod" id="syntax">
+        <h2><span class="no">PART A · UNIT A3</span>R 語言骨架</h2>
+        <p>寫程式不是背單字，是把少數幾種「句子結構」拼起來。這門課後面所有指令都長這樣：</p>
+        <div class="card syntax">
+          <p style="margin:0">完整指令的四種骨架：<code>f(x)</code> 函數呼叫　·　<code>a + b</code> 運算子　·　<code>name &lt;- value</code> 指定　·　<code>x[i]</code> 索引。</p>
+        </div>
+        <div class="tree">程式
+├─ 資料物件 data object     例：6, "six", TRUE, c(7,8,10)
+├─ 函數呼叫 function call    例：log(6)    結構：名字(引數, 引數, …)
+├─ 運算子運算 operator       例：6 + 4     結構：左 運算子 右
+├─ 指定 assignment           例：x &lt;- 10   結構：名字 &lt;- 值
+└─ 索引 indexing             例：x[2]      結構：物件[位置]</div>
+        <table>
+          <thead><tr><th>結構名稱</th><th>課堂寫法</th><th>人話</th></tr></thead>
+          <tbody>
+            <tr><td><span class="term" data-zh="函數呼叫">function call</span></td><td><code>mean(x)</code></td><td>把 x 丟進名叫 mean 的機器</td></tr>
+            <tr><td><span class="term" data-zh="引數">argument</span></td><td><code>n=5, mean=5</code></td><td>丟進去的原料；可用「名字=值」標明</td></tr>
+            <tr><td><span class="term" data-zh="回傳值">return value</span></td><td>螢幕印出的那個物件</td><td>機器吐出來的成品</td></tr>
+            <tr><td><span class="term" data-zh="副作用">side effect</span></td><td>例如把變數改掉、把圖畫出來</td><td>除了回傳值以外，還改變了外界</td></tr>
+            <tr><td><span class="term" data-zh="運算子">operator</span></td><td><code>+  -  *  /  ==  &amp;  &lt;-</code></td><td>其實也是函數，只是寫在中間比較好看</td></tr>
+          </tbody>
+        </table>
+        <div class="card note">課堂原句：A function is a machine which turns input objects, or <b>arguments</b>, into an output object, or a <b>return value</b> (possibly with side effects), according to a definite rule.</div>
+      </section>
+
+      <section class="mod" id="objects">
+        <h2><span class="no">PART B · UNIT B1 · 投影片 4</span>R objects：data 與 function</h2>
+        <div class="grid-2">
+          <article class="card def">
+            <h4>data 資料</h4>
+            <p>像 <code>6</code>、<code>"six"</code>、<code>6.000</code>、以及一排數字組成的矩陣。它是「被處理的東西」。</p>
+          </article>
+          <article class="card def">
+            <h4>functions 函數</h4>
+            <p>像 <code>log</code>、<code>+</code>（兩個引數）、<code>&lt;</code>（兩個）、<code>sum</code>（多個）、<code>mean</code>（一個）。它是「處理資料的機器」。</p>
+          </article>
+        </div>
+        <p>記住：<code>+</code> 也是函數。寫 <code>6 + 4</code> 等價於請 R 執行加法這台機器，兩個引數是 6 和 4。</p>
+      </section>
+
+      <section class="mod" id="types">
+        <h2><span class="no">04 · 投影片 5</span>資料型別 types of data</h2>
+        <p>電腦最底層只用 <span class="term" data-zh="位元">bit</span>：TRUE/FALSE、YES/NO、1/0。再往上組出我們真正使用的型別：</p>
+        <table>
+          <thead><tr><th>型別</th><th>課堂意思</th><th>R 裡長這樣</th></tr></thead>
+          <tbody>
+            <tr><td><span class="term" data-zh="邏輯值">Boolean</span></td><td>直接的二進位</td><td><code>TRUE</code> / <code>FALSE</code>（也可寫 <code>T</code> / <code>F</code>）</td></tr>
+            <tr><td><span class="term" data-zh="整數">integer</span></td><td>整數，固定長度的 bits</td><td>整數 0 的 ASCII 編碼是 <code>0000 0000</code></td></tr>
+            <tr><td><span class="term" data-zh="字元／字串">character / string</span></td><td>文字；string 是一串字元</td><td><code>"six"</code>、<code>"7"</code>。字母 A 的 ASCII 是 <code>0100 0001</code></td></tr>
+            <tr><td><span class="term" data-zh="浮點數">floating point</span></td><td>科學記號：整數 × 某數的整數次方</td><td>如 3×10<sup>6</sup>。R 裡一般數字 <code>6</code> 其實是 double</td></tr>
+            <tr><td>double / single</td><td>精確度</td><td>double = 64 bits（8 bytes）；single = 32 bits</td></tr>
+            <tr><td>缺失／未定義</td><td>沒有值、或算不出來</td><td><code>NA</code>、<code>NaN</code></td></tr>
+          </tbody>
+        </table>
+        <div class="card teacher"><strong>為什麼 <code>typeof(6)</code> 是 <code>"double"</code> 不是 integer？</strong>在 R 裡你隨手打的 6，預設存成浮點數（double），方便做統計除法。若真要整數要寫 <code>6L</code>。課堂後面會用 <code>typeof(6)</code> 讓你親眼看到。</div>
+      </section>
+
+      <section class="mod" id="ops">
+        <h2><span class="no">05 · 投影片 6–7</span>運算子 operators</h2>
+        <p><span class="term" data-zh="一元運算子">Unary</span>：只吃 1 個引數。例如 <code>-</code> 變號、<code>!</code> 邏輯否定。</p>
+        <p><span class="term" data-zh="二元運算子">Binary</span>：吃 2 個引數。例如 <code>+</code> <code>-</code> <code>*</code> <code>/</code>（除法是偏運算，分母不能為 0）、<code>%%</code>（餘數 mod）、<code>^</code> 次方。</p>
+
+        <div class="snippet">
+          <div class="bar"><span>一元：變號</span><button class="copy" type="button">複製</button></div>
+          <pre><code>-6</code></pre>
+          <div class="out">## [1] -6</div>
+          <div class="why">前面的 <code>-</code> 不是減法，因為左邊沒有數字。它把 6 變成 −6。</div>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>加減</span><button class="copy" type="button">複製</button></div>
+          <pre><code>6 + 4
+6 - 4</code></pre>
+          <div class="out">## [1] 10
+## [1] 2</div>
+          <div class="why">先算 6 加 4 得 10；再算 6 減 4 得 2。每次按 Enter 算一行。</div>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>乘、次方、除、整除、餘數</span><button class="copy" type="button">複製</button></div>
+          <pre><code>6 * 4
+6 ^ 4
+6 / 4
+6 %/% 4
+6 %% 4</code></pre>
+          <div class="out">## [1] 24
+## [1] 1296
+## [1] 1.5
+## [1] 1
+## [1] 2</div>
+          <div class="why">
+            <code>*</code> 乘法：24。<br>
+            <code>^</code> 次方：6×6×6×6 = 1296。<br>
+            <code>/</code> 普通除法：1.5（帶小數）。<br>
+            <code>%/%</code> <span class="term" data-zh="整數除法">integer division</span>：只留商，6÷4＝1 餘 2，所以商是 1。<br>
+            <code>%%</code> <span class="term" data-zh="取餘數">modulo</span>：餘數是 2。檢查：1×4+2=6。
+          </div>
+        </div>
+      </section>
+
+      <section class="mod" id="compare">
+        <h2><span class="no">06 · 投影片 8–10</span>比較運算子與邏輯運算子</h2>
+        <p>比較運算子也是二元：左邊一個物件、右邊一個物件，吐回 Boolean。</p>
+        <div class="snippet">
+          <div class="bar"><span>比較</span><button class="copy" type="button">複製</button></div>
+          <pre><code>6 > 5
+6 < 5
+6 >= 7
+6 <= 5
+6 == 5
+6 != 5</code></pre>
+          <div class="out">## [1] TRUE
+## [1] FALSE
+## [1] FALSE
+## [1] FALSE
+## [1] FALSE
+## [1] TRUE</div>
+          <div class="why">
+            <code>&gt;</code> 大於、<code>&lt;</code> 小於、<code>&gt;=</code> 大於等於、<code>&lt;=</code> 小於等於。<br>
+            <code>==</code> 「是不是相等？」——兩個等號。<br>
+            <code>!=</code> 「是不是不相等？」。
+          </div>
+        </div>
+        <div class="card warn"><strong>課堂警告：<code>==</code> 才是比較，<code>=</code> 不是！</strong><code>=</code> 用來指定變數（跟 <code>&lt;-</code> 類似）。若你寫 <code>6 = 5</code>，R 會報錯，因為你不能「指定」一個數字常數。</div>
+
+        <h3>邏輯：<code>&amp;</code> 且、<code>|</code> 或</h3>
+        <p>把兩個 TRUE/FALSE 接起來。且：兩邊都真才真。或：有一邊真就真。</p>
+        <div class="snippet">
+          <div class="bar"><span>邏輯組合</span><button class="copy" type="button">複製</button></div>
+          <pre><code>(5 > 7) &amp; (6 * 7 == 42)
+(5 > 7) | (6 * 7 == 42)
+(5 > 7) | (6 * 7 == 42) &amp; (0 != 0)
+(5 > 7) | (6 * 7 == 42) &amp; (0 != 0) | (9 - 8 >= 0)</code></pre>
+          <div class="out">## [1] FALSE
+## [1] TRUE
+## [1] FALSE
+## [1] TRUE</div>
+          <div class="why">
+            先算括號。<code>5 &gt; 7</code> 是 FALSE；<code>6*7==42</code> 是 TRUE。<br>
+            FALSE 且 TRUE → FALSE。<br>
+            FALSE 或 TRUE → TRUE。<br>
+            第三行：<code>&amp;</code> 比 <code>|</code> 先算，所以是 FALSE 或 (TRUE 且 FALSE) = FALSE 或 FALSE = FALSE。<br>
+            第四行最右邊又或上 TRUE，整句變 TRUE。
+          </div>
+        </div>
+        <div class="card note">課堂註：雙寫的 <code>&amp;&amp;</code> 與 <code>||</code> 不一樣，之後才教。現在請只用單個 <code>&amp;</code>、<code>|</code> 做向量元素的且／或。</div>
+      </section>
+
+      <section class="mod" id="cast">
+        <h2><span class="no">07 · 投影片 11–14</span>檢查型別、轉換型別</h2>
+        <p><code>typeof(x)</code> 告訴你 x 是哪一種。<code>is.某型(x)</code> 問「是不是這種？」回 TRUE/FALSE。<code>as.某型(x)</code> 試圖把 x 翻譯成那種型。</p>
+        <div class="snippet">
+          <div class="bar"><span>typeof / is.x / is.na</span><button class="copy" type="button">複製</button></div>
+          <pre><code>typeof(6)
+is.double(7)
+is.na(7)
+is.na(7/0)
+is.na(0/0)
+is.na("seven")
+is.character(7)
+is.character("7")
+is.character("seven")</code></pre>
+          <div class="out">## [1] "double"
+## [1] TRUE
+## [1] FALSE
+## [1] FALSE
+## [1] TRUE
+## [1] FALSE
+## [1] FALSE
+## [1] TRUE
+## [1] TRUE</div>
+          <div class="why">
+            <code>6</code> 與 <code>7</code> 是 double，所以 <code>is.double(7)</code> 為 TRUE。<br>
+            <code>is.na(7)</code>：7 是正常數字，不是缺失。<br>
+            <code>7/0</code> 在 R 變成 <code>Inf</code>（無限大），不是 NA，所以 FALSE。<br>
+            <code>0/0</code> 沒有定義，變成 <code>NaN</code>，<code>is.na(NaN)</code> 為 TRUE。<br>
+            沒有引號的 <code>7</code> 是數字；有引號的 <code>"7"</code> 是文字。
+          </div>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>as.x 轉換</span><button class="copy" type="button">複製</button></div>
+          <pre><code>as.character(5/6)
+as.numeric(as.character(5/6))
+6 * as.numeric(as.character(5/6))
+5/6 == as.numeric(as.character(5/6))</code></pre>
+          <div class="out">## [1] "0.833333333333333"
+## [1] 0.8333333
+## [1] 5
+## [1] FALSE</div>
+          <div class="why">
+            先把 5/6 變成文字，再轉回數字。印出來好像還是 0.833…，乘 6 也好像變回 5。<br>
+            但最後 <code>==</code> 是 FALSE：因為浮點數無法用有限位元把 5/6 存得一模一樣，轉成文字再轉回來會丟一點精度。
+          </div>
+        </div>
+        <div class="card exam">這是統計計算的核心觀念：電腦裡的小數是近似值。比較兩個計算結果時，後面會用 <code>all.equal()</code> 而不是盲目用 <code>==</code>。</div>
+        <h3>課堂的慣例轉換</h3>
+        <div class="snippet">
+          <div class="bar"><span>TRUE/FALSE 與 1/0</span><button class="copy" type="button">複製</button></div>
+          <pre><code>as.numeric(TRUE)
+as.numeric(FALSE)
+as.logical(1)
+as.logical(0)
+as.character(TRUE)</code></pre>
+          <div class="out">## [1] 1
+## [1] 0
+## [1] TRUE
+## [1] FALSE
+## [1] "TRUE"</div>
+          <div class="why">TRUE 當數字是 1，FALSE 是 0。這就是為什麼後面可以把邏輯向量拿去相加：等於在數有幾個 TRUE。</div>
+        </div>
+      </section>
+
+      <section class="mod" id="vars">
+        <h2><span class="no">08 · 投影片 15–17</span>變數：幫資料取名字</h2>
+        <p>物件可以有名字，叫做 <span class="term" data-zh="變數">variable</span>。有些是內建的，例如 <code>pi</code>。</p>
+        <div class="snippet">
+          <div class="bar"><span>內建變數也可以當引數</span><button class="copy" type="button">複製</button></div>
+          <pre><code>pi
+pi * 10
+cos(pi)</code></pre>
+          <div class="out">## [1] 3.141593
+## [1] 31.41593
+## [1] -1</div>
+          <div class="why"><code>cos</code> 是餘弦函數。π 的餘弦是 −1。語法就是 <code>函數名(引數)</code>。</div>
+        </div>
+        <p>自己造變數用指定運算子 <code>&lt;-</code> 或 <code>=</code>。課堂兩種都用。</p>
+        <div class="snippet">
+          <div class="bar"><span>指定與覆寫</span><button class="copy" type="button">複製</button></div>
+          <pre><code>approx.pi = 22/7
+approx.pi
+diameter &lt;- 10
+approx.pi * diameter
+circumference = approx.pi * diameter
+circumference
+circumference = 30
+circumference</code></pre>
+          <div class="out">## [1] 3.142857
+## [1] 31.42857
+## [1] 31.42857
+## [1] 30</div>
+          <div class="why">
+            第一步：把 22/7 這個值貼上標籤 <code>approx.pi</code>。<br>
+            只打變數名，R 就印出它現在裝的東西。<br>
+            <code>diameter &lt;- 10</code> 與用 <code>=</code> 效果相同。<br>
+            最後一次 <code>circumference = 30</code> 會<strong>覆蓋</strong>舊值，周長不再是 31.42，而是 30。
+          </div>
+        </div>
+        <div class="card teacher">
+          <strong>課堂 Remark：</strong>程式應由有意義的變數名組成，方便設計、除錯、改進、給別人讀。避免「魔法數字」（magic constants），改用命名變數。命名是走向 <span class="term" data-zh="抽象">abstraction</span> 的第一步。
+        </div>
+      </section>
+
+      <section class="mod" id="workspace">
+        <h2><span class="no">09 · 投影片 18</span>R workspace 工作空間</h2>
+        <p>變數住在目前這個工作空間。 <code>ls()</code> 列出名字；<code>rm("名字")</code> 刪掉它。</p>
+        <div class="snippet">
+          <div class="bar"><span>查看與刪除</span><button class="copy" type="button">複製</button></div>
+          <pre><code>ls()
+rm("circumference")
+ls()</code></pre>
+          <div class="out">## 會列出你現在擁有的變數名稱
+## 刪掉 circumference 之後，清單裡就沒有它了</div>
+          <div class="why"><code>ls</code> 與 <code>rm</code> 都是函數。括號不能省：<code>ls</code> 是函數本身，<code>ls()</code> 才是「請執行它」。</div>
+        </div>
+      </section>
+
+      <section class="mod" id="vectors">
+        <h2><span class="no">PART C · UNIT C1 · 投影片 19–23</span>vector 向量</h2>
+        <p><span class="term" data-zh="資料結構">data structure</span> = 把相關資料值組成一個物件。向量是<strong>同一型別</strong>的一串值。</p>
+        <div class="snippet">
+          <div class="bar"><span>c() 與 1:10</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x = c(7, 8, 10, 45)
+x
+is.vector(x)
+y &lt;- 1:10
+y</code></pre>
+          <div class="out">## [1]  7  8 10 45
+## [1] TRUE
+##  [1]  1  2  3  4  5  6  7  8  9 10</div>
+          <div class="why">
+            <code>c()</code> 是 combine／concatenate：依你寫的順序把引數接成向量。<br>
+            <code>1:5</code> 是 <code>c(1,2,3,4,5)</code> 的速記。冒號 <code>:</code> 產生從左到右的整數序列。
+          </div>
+        </div>
+        <h3>索引 indexing：拿出某幾個位置</h3>
+        <p>R 的位置從 <strong>1</strong> 開始（不是 0）。<code>x[1]</code> 第一個；<code>x[-2]</code> 去掉第二個之後剩下的。</p>
+        <div class="snippet">
+          <div class="bar"><span>用位置、用邏輯值取出</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x = c(7, 8, 10, 45)
+x[2]
+x[-2]
+x[c(1,3)]
+x[c(T,F,T,F)]</code></pre>
+          <div class="out">## [1] 8
+## [1]  7 10 45
+## [1]  7 10
+## [1]  7 10</div>
+          <div class="why">
+            方括號 <code>[]</code> 是索引語法，不是函數呼叫的圓括號。<br>
+            <code>c(1,3)</code> 表示「第 1 與第 3」。 <code>c(T,F,T,F)</code> 表示「要、不要、要、不要」，所以留下 7 與 10。
+          </div>
+        </div>
+        <h3>改寫某些位置</h3>
+        <div class="snippet">
+          <div class="bar"><span>指定到 x 的某一格</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x = c(7, 8, 10, 45)
+x[2] &lt;- 0
+x
+x[c(1,3)] &lt;- 20
+x
+x[-4] &lt;- 100
+x
+x[c(T,F,T,F)] &lt;- -100
+x</code></pre>
+          <div class="out">## [1]  7  0 10 45
+## [1] 20  0 20 45
+## [1] 100 100 100  45
+## [1] -100  100 -100   45</div>
+          <div class="why">左邊是「要改的那些格子」，右邊是新值。若右邊只有一個數，R 會把它填進所有被選中的格子（這就是後面要說的 recycling）。</div>
+        </div>
+        <h3>先做一個空向量再填</h3>
+        <div class="snippet">
+          <div class="bar"><span>vector(length, mode)</span><button class="copy" type="button">複製</button></div>
+          <pre><code>weekly.hours = vector(length=5)
+weekly.hours
+weekly.hours = vector(length=5, mode = "character")
+weekly.hours
+weekly.hours = vector(length=5, mode = "numeric")
+weekly.hours
+weekly.hours[5] = 8
+weekly.hours</code></pre>
+          <div class="out">## [1] FALSE FALSE FALSE FALSE FALSE
+## [1] "" "" "" "" ""
+## [1] 0 0 0 0 0
+## [1] 0 0 0 0 8</div>
+          <div class="why">
+            預設 mode 是邏輯，空的邏輯向量全是 FALSE。<br>
+            character 空字串 <code>""</code>；numeric 則是 0。<br>
+            最後只改第 5 格變成 8，前四格仍是 0。
+          </div>
+        </div>
+        <h3>從機率分配抽隨機樣本</h3>
+        <p>課堂：常態 <code>rnorm</code>、二項 <code>rbinom</code>、均勻 <code>runif</code>。函數結構都是「名字 + 有名字的引數」。</p>
+        <div class="snippet">
+          <div class="bar"><span>隨機向量（每次數字會不同）</span><button class="copy" type="button">複製</button></div>
+          <pre><code>rnorm(n=5, mean=5, sd=3)
+rbinom(n=5, size=10, prob=0.5)
+runif(n=5, min=0, max=10)</code></pre>
+          <div class="out">## 五個大約在 5 附近、標準差 3 的常態亂數
+## 五個「丟 10 次公平銅板，正面次數」
+## 五個 0 到 10 之間的均勻亂數</div>
+          <div class="why">
+            <code>n</code> = 要幾個數。<code>mean</code>/<code>sd</code> = 常態的平均與標準差。<br>
+            <code>size</code> = 二項的試驗次數，<code>prob</code> = 成功機率。<br>
+            因為是隨機，你螢幕上的數字不會跟投影片一模一樣，這是正常的。
+          </div>
+        </div>
+      </section>
+
+      <section class="mod" id="vec-arith">
+        <h2><span class="no">11 · 投影片 24–27</span>向量運算、回收、比較</h2>
+        <p>算術運算子對向量是「逐個位置算」，叫做 component-wise。</p>
+        <div class="snippet">
+          <div class="bar"><span>一樣長的兩個向量</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x = c(7, 8, 10, 45)
+y = c(-7, -8, -10, -45)
+x + y
+x * y</code></pre>
+          <div class="out">## [1] 0 0 0 0
+## [1]   -49   -64  -100 -2025</div>
+          <div class="why">7+(−7)=0，8+(−8)=0… 乘法同理：7×(−7)=−49。</div>
+        </div>
+        <h3>Recycling 回收：短的會重複使用</h3>
+        <div class="snippet">
+          <div class="bar"><span>短向量對齊長向量</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x = c(7, 8, 10, 45)
+x + c(-7, -8)
+x ^ c(1, 0, -1, 0.5)
+2 * x</code></pre>
+          <div class="out">## [1]  0  0  3 37
+## [1] 7.000000 1.000000 0.100000 6.708204
+## [1] 14 16 20 90</div>
+          <div class="why">
+            <code>c(-7,-8)</code> 只有 2 格，R 會當成 −7, −8, −7, −8 再相加：7−7=0，8−8=0，10−7=3，45−8=37。<br>
+            次方：7<sup>1</sup>=7，8<sup>0</sup>=1，10<sup>−1</sup>=0.1，√45≈6.71。<br>
+            單個數字是長度 1 的向量，所以 <code>2 * x</code> 等於每個元素乘 2。
+          </div>
+        </div>
+        <h3>逐元素比較</h3>
+        <div class="snippet">
+          <div class="bar"><span>得到一串 TRUE/FALSE</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x = c(7, 8, 10, 45)
+x > 9
+(x > 9) &amp; (x < 20)
+(x > 9) | (x < 20)</code></pre>
+          <div class="out">## [1] FALSE FALSE  TRUE  TRUE
+## [1] FALSE FALSE  TRUE FALSE
+## [1] TRUE TRUE TRUE TRUE</div>
+          <div class="why">7 與 8 都不大於 9；10 與 45 大於 9。第二行還要求小於 20，所以只剩 10。第三行「或」幾乎全真，因為每個數要嘛 &gt;9，要嘛 &lt;20。</div>
+        </div>
+        <h3>整條向量相不相等：<code>identical()</code> 與 <code>all.equal()</code></h3>
+        <div class="snippet">
+          <div class="bar"><span>不要只看 x == y 的那串 TRUE</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x = c(7, 8, 10, 45)
+y = -c(7, 8, 10, 45)
+x == -y
+identical(x, -y)
+identical(c(0.5-0.3, 0.3-0.1), c(0.3-0.1, 0.5-0.3))
+all.equal(c(0.5-0.3, 0.3-0.1), c(0.3-0.1, 0.5-0.3))</code></pre>
+          <div class="out">## [1] TRUE TRUE TRUE TRUE
+## [1] TRUE
+## [1] FALSE
+## [1] TRUE</div>
+          <div class="why">
+            <code>-c(7,8,10,45)</code> 對每個元素變號。<code>x == -y</code> 仍是長度 4 的邏輯向量。<br>
+            <code>identical()</code> 問「整個物件是否完全同一」。<br>
+            小數相減會有位元誤差，所以 <code>identical</code> 可能 FALSE，<code>all.equal</code> 允許微小誤差所以 TRUE。
+          </div>
+        </div>
+      </section>
+
+      <section class="mod" id="vec-fun">
+        <h2><span class="no">12 · 投影片 28–29</span>作用在向量上的函數、以及 NA</h2>
+        <p>很多函數直接吃整條向量：<code>mean</code> <code>median</code> <code>sd</code> <code>var</code> <code>max</code> <code>min</code> <code>length</code> <code>sum</code> 回傳單個數；<code>sort</code> 回傳新向量；<code>summary</code> 給五數摘要；<code>any</code> / <code>all</code> 吃邏輯向量。</p>
+        <div class="snippet">
+          <div class="bar"><span>summary</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x &lt;- 1:234
+summary(x)</code></pre>
+          <div class="out">##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+##    1.00   59.25  117.50  117.50  175.75  234.00</div>
+          <div class="why">1 到 234 的最小、第一四分位、中位數、平均、第三四分位、最大。因為是連續整數，平均等於中位數。</div>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>NA 會傳染給 mean/sd</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x &lt;- c(1:234, NA)
+mean(x)
+sd(x)
+mean(x, na.rm = T)
+summary(x)</code></pre>
+          <div class="out">## [1] NA
+## [1] NA
+## [1] 117.5
+## 最後一欄 NA's = 1</div>
+          <div class="why">
+            預設：資料裡有一個 NA，平均就變成 NA（R 拒絕假裝沒看到缺失）。<br>
+            <code>na.rm = T</code> 表示 remove NA 再算。<code>T</code> 是 <code>TRUE</code> 的簡寫。<br>
+            <code>summary</code> 仍會告訴你有幾個 NA。
+          </div>
+        </div>
+      </section>
+
+      <section class="mod" id="which">
+        <h2><span class="no">13 · 投影片 30–32</span>用條件取出、which()、命名</h2>
+        <div class="snippet">
+          <div class="bar"><span>x[x&gt;9] 與 which()</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x = c(7, 8, 10, 45)
+y = c(-7, -8, -10, -45)
+x[x > 9]
+y[x > 9]
+places = which(x > 9)
+places
+y[places]</code></pre>
+          <div class="out">## [1] 10 45
+## [1] -10 -45
+## [1] 3 4
+## [1] -10 -45</div>
+          <div class="why">
+            <code>x &gt; 9</code> 先變成 FALSE FALSE TRUE TRUE，再用它當口罩去濾 <code>x</code>。<br>
+            同一個口罩也可以戴在 <code>y</code> 上（前提是 y 與 x 一樣長）。<br>
+            <code>which()</code> 把「哪些格子是 TRUE」變成位置號碼 3 與 4。
+          </div>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>names()</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x = c(7, 8, 10, 45)
+y = c(-7, -8, -10, -45)
+names(x) = c("v1", "v2", "v3", "fred")
+names(x)
+x[c("fred", "v1")]
+names(y) = names(x)
+sort(names(x))
+which(names(x) == "fred")</code></pre>
+          <div class="out">## [1] "v1"   "v2"   "v3"   "fred"
+## fred   v1
+##   45    7
+## [1] "fred" "v1"   "v2"   "v3"
+## [1] 4</div>
+          <div class="why">印出來的 v1、fred 是<strong>標籤</strong>，不是新的元素。可以用名字取值。<code>sort(names(x))</code> 只排序名字那條文字向量。<code>which(names(x)=="fred")</code> 得到位置 4。</div>
+        </div>
+      </section>
+
+      <section class="mod" id="arrays">
+        <h2><span class="no">14 · 投影片 33–38</span>陣列 array：向量的多維推廣</h2>
+        <p><code>array(資料, dim=c(列數, 欄數))</code>。R 預設<strong>按欄填入</strong>（column-major）。</p>
+        <div class="snippet">
+          <div class="bar"><span>做成 2×2</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x = c(7, 8, 10, 45)
+x.arr = array(x, dim=c(2,2))
+x.arr
+dim(x.arr)
+is.vector(x.arr)
+is.array(x.arr)
+typeof(x.arr)
+dim(1:5)</code></pre>
+          <div class="out">##      [,1] [,2]
+## [1,]    7   10
+## [2,]    8   45
+## [1] 2 2
+## [1] FALSE
+## [1] TRUE
+## [1] "double"
+## NULL</div>
+          <div class="why">
+            填法：先填第 1 欄 7、8，再填第 2 欄 10、45。<br>
+            陣列不再被 <code>is.vector</code> 當成向量。<code>typeof</code> 仍是 double，因為裡面裝的還是數字。<br>
+            普通向量 <code>1:5</code> 的 <code>dim</code> 是 <code>NULL</code>：向量不是 1 維 array。
+          </div>
+        </div>
+        <p>取值可用「第幾列, 第幾欄」，或用底下那條向量的第幾個（仍按欄）。</p>
+        <div class="snippet">
+          <div class="bar"><span>x.arr[1,2] 等於底下的第 3 格</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x = c(7, 8, 10, 45)
+x.arr = array(x, dim = c(2, 2))
+x.arr[1, 2]
+x.arr[3]
+x.arr[c(1, 2), 2]
+x.arr[, 2]
+x.arr[, 2, drop = FALSE]</code></pre>
+          <div class="out">## [1] 10
+## [1] 10
+## [1] 10 45
+## [1] 10 45
+##      [,1]
+## [1,]   10
+## [2,]   45</div>
+          <div class="why">
+            省略某個維度的索引 = 要「那一維的全部」。<code>x.arr[,2]</code> 是第 2 欄整欄。<br>
+            預設會 <span class="term" data-zh="降維">drop</span> 成向量。加上 <code>drop=FALSE</code> 強迫結果仍是陣列（還看得到列、欄）。
+          </div>
+        </div>
+        <p><code>which(x.arr &gt; 9)</code> 若不認識陣列，就把它當底下那條向量，回傳位置 3 與 4。陣列專用的運算（<code>+</code> <code>*</code> <code>^</code>）會保留形狀：</p>
+        <div class="snippet">
+          <div class="bar"><span>兩個同形狀陣列逐格運算</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x = c(7, 8, 10, 45)
+x.arr = array(x, dim=c(2,2))
+y.arr = array(-x, dim=c(2,2))
+y.arr + x.arr
+y.arr * x.arr</code></pre>
+          <div class="out">## 加法全 0；乘法為 −49, −64, −100, −2025，仍排成 2×2</div>
+        </div>
+      </section>
+
+      <section class="mod" id="matrix">
+        <h2><span class="no">15 · 投影片 39–46</span>矩陣 matrix：2 維陣列的特化</h2>
+        <div class="snippet">
+          <div class="bar"><span>matrix(..., nrow=)</span><button class="copy" type="button">複製</button></div>
+          <pre><code>A = matrix(c(40, 1, 60, 3), nrow=2)
+A
+is.array(A)
+is.matrix(A)</code></pre>
+          <div class="out">##      [,1] [,2]
+## [1,]   40   60
+## [2,]    1    3
+## [1] TRUE
+## [1] TRUE</div>
+          <div class="why">也可寫 <code>ncol</code>。若要「按列填」加 <code>byrow=TRUE</code>。一般加減乘除仍是逐格，例如 <code>A/3</code>。</div>
+        </div>
+        <h3>真正的矩陣乘法是 <code>%*%</code>，不是 <code>*</code></h3>
+        <div class="snippet">
+          <div class="bar"><span>A 是 2×2，B 是 2×3</span><button class="copy" type="button">複製</button></div>
+          <pre><code>A = matrix(c(40, 1, 60, 3), nrow = 2)
+B = matrix(rep(7, 6), ncol = 3)
+B
+A %*% B
+B %*% 1:3</code></pre>
+          <div class="out">## B 每格都是 7
+## A %*% B 得到 2×3，第一列全 700，第二列全 28
+## B %*% 1:3 得到兩列都是 42</div>
+          <div class="why">
+            <code>rep(7,6)</code> = 把 7 重複 6 次。<code>ncol=3</code> 所以 2 列 3 欄。<br>
+            線性代數：左矩陣的欄數必須等於右矩陣的列數。<br>
+            第一格 700 = 40×7 + 60×7。也可以矩陣乘向量。
+          </div>
+        </div>
+        <div class="grid-2">
+          <article class="card">
+            <h4>列／欄加總與平均</h4>
+            <p><code>rowSums(A)</code> → 100, 4（40+60 與 1+3）</p>
+            <p><code>colSums(A)</code> → 41, 63</p>
+            <p><code>rowMeans</code> / <code>colMeans</code> 同理。</p>
+          </article>
+          <article class="card">
+            <h4>diag、轉置、行列式</h4>
+            <p><code>diag(A)</code> 取出對角線 40, 3；也可指定 <code>diag(A) = c(35,4)</code> 改掉它。</p>
+            <p><code>diag(c(3,4))</code> 做對角矩陣；<code>diag(2)</code> 做 2×2 單位矩陣。</p>
+            <p><code>t(A)</code> 轉置；<code>det(A)</code> 行列式，課堂後來改完對角線後 det=80。</p>
+          </article>
+        </div>
+        <h3>反矩陣與解線性方程組</h3>
+        <div class="snippet">
+          <div class="bar"><span>solve()</span><button class="copy" type="button">複製</button></div>
+          <pre><code>A = matrix(c(40, 1, 60, 3), nrow = 2)
+diag(A) = c(35, 4)
+A %*% solve(A)
+solve(A) %*% 1:2
+solve(A, 1:2)</code></pre>
+          <div class="out">## 得到單位矩陣（對角 1、其餘 0）
+## 兩種寫法都在解 A x = b，b 是 1:2</div>
+          <div class="why"><code>solve(A)</code> = A 的反矩陣 A<sup>−1</sup>。<code>solve(A, b)</code> 直接解 A x = b，不必先顯式做出反矩陣，數值上更穩。</div>
+        </div>
+        <h3>幫列、欄取名字</h3>
+        <div class="snippet">
+          <div class="bar"><span>rownames / colnames</span><button class="copy" type="button">複製</button></div>
+          <pre><code>A = matrix(c(35, 1, 60, 4), nrow = 2)
+rownames(A) &lt;- c("Subject1", "Subject2")
+colnames(A) &lt;- c("Movie1", "Movie2")
+A
+A["Subject1", "Movie2"]
+A[, "Movie2"]</code></pre>
+          <div class="out">##          Movie1 Movie2
+## Subject1     35     60
+## Subject2      1      4
+## [1] 60
+## Subject1 Subject2
+##       60        4</div>
+          <div class="why">有了名字就可以用文字當座標，不用死記第幾列第幾欄。這對資料分析非常重要。</div>
+        </div>
+      </section>
+
+      <section class="mod" id="lists">
+        <h2><span class="no">16 · 投影片 47–56</span>串列 list：可以混裝不同型別</h2>
+        <p>向量要求全部同一型；list 是一串值，<strong>不必</strong>同一型。</p>
+        <div class="snippet">
+          <div class="bar"><span>建立 list</span><button class="copy" type="button">複製</button></div>
+          <pre><code>sample1 = list("male", 7, FALSE)
+sample1</code></pre>
+          <div class="out">## [[1]] "male"
+## [[2]] 7
+## [[3]] FALSE</div>
+          <div class="why">三格分別是文字、數字、邏輯。印出來的 <code>[[1]]</code> 是第 1 個元件的標號。</div>
+        </div>
+        <h3><code>[ ]</code> 與 <code>[[ ]]</code> 差在哪？這是本講最容易考的結構</h3>
+        <div class="snippet">
+          <div class="bar"><span>單括號留下 list，雙括號取出裡面的值</span><button class="copy" type="button">複製</button></div>
+          <pre><code>sample1 = list("male", 7, FALSE)
+sample1[2]
+is.list(sample1[2])
+sample1[[2]]
+is.list(sample1[[2]])</code></pre>
+          <div class="out">## [[1]]
+## [1] 7
+## [1] TRUE
+## [1] 7
+## [1] FALSE</div>
+          <div class="why">
+            <code>[2]</code> 仍是長度 1 的 list（盒子還在，只是盒子裡只有第 2 件）。<br>
+            <code>[[2]]</code> 把盒子拆開，拿到裡面的數字 7。<br>
+            口訣：<strong>單括號切區塊，雙括號拆內容。</strong>
+          </div>
+        </div>
+        <p>加長用 <code>c()</code>；縮短把 <code>length(sample1)</code> 設小一點；去掉某一件用 <code>sample1[-2]</code>（與向量相同）。</p>
+        <div class="snippet">
+          <div class="bar"><span>用名字與 $</span><button class="copy" type="button">複製</button></div>
+          <pre><code>sample1 = list("male", 7, FALSE)
+names(sample1) = c("gender", "age", "disease")
+sample1[["gender"]]
+sample1["gender"]
+sample1$gender
+sample2 = list(gender = "female", age = 20, height = 165, disease = TRUE)
+sample2$graduated = FALSE
+sample2[["last.updated"]] = "2021-01-01"
+sample2$graduated = NULL</code></pre>
+          <div class="out">## $ 與 [[ ]] 都拿到 "male" / "female"
+## ["gender"] 仍是一個小 list
+## 指定 NULL 會刪掉那個元件</div>
+          <div class="why">
+            <code>$gender</code> 是 <code>[["gender"]]</code> 的快捷寫法，名字不能有空格時最方便。<br>
+            新增：直接 <code>物件$新名字 = 值</code>。<br>
+            刪除：把它指定成 <code>NULL</code>。
+          </div>
+        </div>
+        <div class="card exam">這就是 <span class="term" data-zh="鍵值對">key-value pair</span>（也叫 dictionary、associative array）：用名字找資料，不必記得它排第幾。分析一堆樣本時，大家都有 <code>age</code> 欄，你就寫 <code>$age</code>。</div>
+      </section>
+
+      <section class="mod" id="df">
+        <h2><span class="no">17 · 投影片 57–62</span>資料框 data.frame：統計最常用的表</h2>
+        <p>經典資料表：列是個案，欄是變數。它是 list 與 matrix 的孩子：欄可以不同型，但每一欄自己仍是向量（同一型）。很多矩陣函數（<code>rowSums</code>、<code>summary</code>、<code>apply</code>）也能用。</p>
+        <div class="snippet">
+          <div class="bar"><span>從矩陣做出 data.frame，再加一欄邏輯值</span><button class="copy" type="button">複製</button></div>
+          <pre><code>a.mat = matrix(c(35,8,10,4), nrow=2)
+colnames(a.mat) = c("v1","v2")
+a.df = data.frame(a.mat, logicals=c(TRUE, FALSE))
+a.df
+a.df[,1]
+typeof(a.df[,1])
+typeof(a.df[,"logicals"])</code></pre>
+          <div class="out">##   v1 v2 logicals
+## 1 35 10     TRUE
+## 2  8  4    FALSE
+## [1] 35  8
+## [1] "double"
+## [1] "logical"</div>
+          <div class="why">第 1 欄是數字向量，logicals 欄是邏輯向量。這是矩陣做不到的：矩陣不能一欄數字、一欄 TRUE/FALSE。</div>
+        </div>
+        <p>取欄可以用矩陣寫法，也可以用 list 寫法：</p>
+        <div class="snippet">
+          <div class="bar"><span>四種取 v1 的方法</span><button class="copy" type="button">複製</button></div>
+          <pre><code>a.mat = matrix(c(35, 8, 10, 4), nrow = 2)
+colnames(a.mat) = c("v1", "v2")
+a.df = data.frame(a.mat, logicals = c(TRUE, FALSE))
+a.df[, "v1"]
+a.df$v1
+a.df[["v1"]]
+a.df["v1"]</code></pre>
+          <div class="out">## 前三種得到向量 35, 8
+## 最後一種 a.df["v1"] 得到「只含 v1 這一欄的 data.frame」</div>
+          <div class="why">課堂問：<code>a.df["v1"]</code> 的型別是什麼？答案：它仍是 list／data.frame（單括號不拆盒），不是純向量。用 <code>typeof(a.df["v1"])</code> 自己確認。</div>
+        </div>
+        <p>取<strong>一列</strong>會混到不同型別，所以結果是 list：</p>
+        <div class="snippet">
+          <div class="bar"><span>一列</span><button class="copy" type="button">複製</button></div>
+          <pre><code>a.mat = matrix(c(35, 8, 10, 4), nrow = 2)
+colnames(a.mat) = c("v1", "v2")
+a.df = data.frame(a.mat, logicals = c(TRUE, FALSE))
+a.df[1, ]
+typeof(a.df[1, ])</code></pre>
+          <div class="out">##   v1 v2 logicals
+## 1 35 10     TRUE
+## [1] "list"</div>
+        </div>
+        <h3>加欄 <code>cbind</code>、加列 <code>rbind</code></h3>
+        <div class="snippet">
+          <div class="bar"><span>cbind 加欄</span><button class="copy" type="button">複製</button></div>
+          <pre><code>a.mat = matrix(c(35, 8, 10, 4), nrow = 2)
+colnames(a.mat) = c("v1", "v2")
+a.df = data.frame(a.mat, logicals = c(TRUE, FALSE))
+cbind(a.df, letters = c("A", "D"))
+cbind(a.df, c(3, 4))</code></pre>
+          <div class="out">## 第一種新欄名叫 letters
+## 第二種沒給名字，欄名會很醜：c(3, 4)</div>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>rbind 加列：型別要對</span><button class="copy" type="button">複製</button></div>
+          <pre><code>a.mat = matrix(c(35, 8, 10, 4), nrow = 2)
+colnames(a.mat) = c("v1", "v2")
+a.df = data.frame(a.mat, logicals = c(TRUE, FALSE))
+rbind(a.df, list(v1 = -3, v2 = -5, logicals = TRUE))
+rbind(a.df, data.frame(v1 = -3, v2 = -5, logicals = TRUE))
+rbind(a.df, c(3, 4, 6))</code></pre>
+          <div class="out">## 前兩種 logicals 仍是 TRUE/FALSE
+## 第三種 c(3,4,6) 是純數字向量，R 會把 TRUE/FALSE 強迫轉成 1/0</div>
+          <div class="why">課堂要你小心 forced type conversion。用 <code>list(...)</code> 或另一個 data.frame 去 rbind，才能保住邏輯欄。丟一個普通向量進去，整欄可能變成數字。</div>
+        </div>
+      </section>
+
+      <section class="mod" id="nested">
+        <h2><span class="no">18 · 投影片 63</span>結構的結構</h2>
+        <p>list 的每一格不必是單值，也可以是向量、矩陣、甚至另一個 list。</p>
+        <div class="snippet">
+          <div class="bar"><span>把矩陣 A 與樣本 list 裝進同一個袋子</span><button class="copy" type="button">複製</button></div>
+          <pre><code>A = matrix(c(35, 1, 60, 4), nrow = 2)
+rownames(A) &lt;- c("Subject1", "Subject2")
+colnames(A) &lt;- c("Movie1", "Movie2")
+sample1 = list(gender = "male", age = 7, disease = FALSE)
+my.list = list(A = A, my.lucky.num = 13, sample1 = sample1)
+my.list</code></pre>
+          <div class="out">## $A          一整張有列名欄名的矩陣
+## $my.lucky.num   13
+## $sample1$gender / $age / $disease</div>
+          <div class="why">這就是真實專案的樣子：一份分析物件裡同時放模型矩陣、一個數字、一筆樣本。取出來寫 <code>my.list$A</code> 或 <code>my.list$sample1$age</code>。</div>
+        </div>
+      </section>
+
+      <section class="mod" id="map">
+        <h2><span class="no">PART D · UNIT D1 · 投影片 64</span>結構選擇圖</h2>
+        <ol>
+          <li>寫程式 = 組合函數去操作資料。</li>
+          <li>基本型別：Boolean、數字、文字。</li>
+          <li>資料結構把相關值捆在一起。</li>
+          <li>vector：同一型的一串。</li>
+          <li>array：給向量加上多維形狀（按欄填）。</li>
+          <li>matrix：行為符合線性代數直覺，乘法用 <code>%*%</code>。</li>
+          <li>list：可以混不同型，用名字當鑰匙。</li>
+          <li>data.frame：矩陣＋list 的混血，每欄可不同型，是統計表格。</li>
+        </ol>
+        <div class="tree">選哪一種結構？
+問：全部同一型嗎？
+  ├─ 是，只要一條 → vector
+  ├─ 是，要排成列×欄 → matrix / array
+  └─ 否，要混裝
+        ├─ 一筆個案的欄位 → list
+        └─ 很多列、每欄一種型 → data.frame</div>
+      </section>
+
+      <section class="mod" id="iter-review">
+        <h2><span class="no">PART E · UNIT E1 · Iteration 投影片 1–2</span>第二講 Iteration：複習地圖</h2>
+        <p class="subhead">正式標題是 <span class="term" data-zh="迭代">Iteration</span>。老師仍是 Mingxuan Cai。這一講做三件咬合的事：把東西取出來、依條件走哪一條路、把同一套規則重複很多次。</p>
+        <div class="card teacher">
+          索引、條件、迴圈都不是新的「資料」，而是對舊資料做事的方法。若向量、矩陣、list 的差別還模糊，請先回到 Part C 再往下讀。
+        </div>
+        <table>
+          <thead><tr><th>課堂原句</th><th>白話</th><th>對回</th></tr></thead>
+          <tbody>
+            <tr><td>The basic data types let us represent Booleans, numbers, and characters</td><td>基本型別用來表示是非、數字、文字。</td><td><a href="#types">B2 type</a></td></tr>
+            <tr><td>Data structures let us group together related values</td><td>資料結構把相關的值收在一起。</td><td><a href="#vectors">C1 起</a></td></tr>
+            <tr><td>Vectors let us group values of the same type</td><td>向量：同一型別的一排值。</td><td><a href="#vectors">vector</a></td></tr>
+            <tr><td>Arrays add multi-dimensional structure to vectors</td><td>陣列在向量上加了多維結構。</td><td><a href="#arrays">array</a></td></tr>
+            <tr><td>Matrices special 2-d arrays</td><td>矩陣是特別的二維陣列。</td><td><a href="#matrix">matrix</a></td></tr>
+            <tr><td>Lists allow us combine different types of data</td><td>List 讓不同型別住在同一物件。</td><td><a href="#lists">list</a></td></tr>
+            <tr><td>Data frames are hybrids of matrices and lists</td><td>Data frame 是矩陣與 list 的混血，每欄可不同型。</td><td><a href="#df">data.frame</a></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="mod" id="idx-three">
+        <h2><span class="no">E2 · Iteration 投影片 3–4</span>三種索引</h2>
+        <p><span class="term" data-zh="索引">Index</span> 的日常意思是「按門牌去找」。對 vector、matrix、data frame、list 都適用同一套三種門牌：</p>
+        <ol>
+          <li><span class="term" data-zh="明確的整數索引">explicit integer indices</span>：寫第幾個；負整數表示「去掉第幾個」。</li>
+          <li><span class="term" data-zh="布林向量">Boolean vector</span>：一排 TRUE/FALSE，TRUE 留下、FALSE 丟掉。常常當場用比較做出來，課堂叫 <span class="term" data-zh="現算現用">on-the-fly</span>。</li>
+          <li><span class="term" data-zh="名稱">names</span>：用你事先取好的名字去拿。</li>
+        </ol>
+        <div class="card warn"><strong>名稱不會自己長出來。</strong>課堂原句：in general, we have to set the names ourselves。向量與 list 用 <code>names()</code>；矩陣與 data frame 用 <code>rownames()</code>、<code>colnames()</code>。</div>
+        <div class="card note">規則同一套，只是形狀不同：向量寫 <code>x[3]</code>；矩陣常寫 <code>x[2, 2]</code>；list 要分清 <code>[ ]</code> 與 <code>[[ ]]</code>。</div>
+      </section>
+
+      <section class="mod" id="idx-int">
+        <h2><span class="no">E3 · Iteration 投影片 5–10</span>整數索引</h2>
+        <p class="subhead">先造一條課堂會一路用的向量。請你也從頭打，後面數字才對得上。</p>
+        <div class="snippet">
+          <div class="bar"><span>可重現的隨機向量</span><button class="copy" type="button">複製</button></div>
+          <pre><code>set.seed(33) # For reproducibility
+x.vec = rnorm(6) # Generate a vector of 6 random standard normals
+x.vec</code></pre>
+          <div class="out">[1] -0.13592452 -0.04079697  1.01053901 -0.15826244 -2.15663750  0.49864683</div>
+          <div class="why">
+            <code>set.seed(33)</code>：<span class="term" data-zh="種子">seed</span> 是亂數產生器的起點。同一顆種子會走出同一串「隨機」數，所以講義與你的電腦會得到同一條 <code>x.vec</code>。括號裡的 33 只是老師選的號碼。<br>
+            <code>rnorm(6)</code>：從 <span class="term" data-zh="標準常態">standard normal</span>（平均 0、標準差 1）抽出 6 個數。函式名的 <code>r</code> 常表示 random，<code>norm</code> 表示 normal。<br>
+            <code>x.vec = rnorm(6)</code>：把抽出來的向量貼上名字。點號 <code>.</code> 只是名字的一部分，不是小數點運算；課堂愛用 <code>x.vec</code> / <code>x.mat</code> / <code>x.list</code> 提醒你這是哪一種結構。<br>
+            <code>#</code> 後面是 <span class="term" data-zh="註解">comment</span>，R 不執行。
+          </div>
+        </div>
+        <h3>正整數：拿這些位置</h3>
+        <p>位置從 <strong>1</strong> 起算。方括號 <code>[ ]</code> 的意思是「打開這件容器，按門牌取子集」。索引向量是購物清單，不是集合：你寫的順序就是取出的順序。</p>
+        <div class="snippet">
+          <div class="bar"><span>依位置取出</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x.vec[3] # Third element
+x.vec[c(3,4,5)] # or x.vec[3:5]
+x.vec[c(3,5,4)] # Third, fifth, then fourth</code></pre>
+          <div class="out">[1] 1.010539
+[1]  1.0105390 -0.1582624 -2.1566375
+[1]  1.0105390 -2.1566375 -0.1582624</div>
+          <div class="why">
+            <code>x.vec[3]</code> 拿第 3 個。<code>c(3,4,5)</code> 等價於 <code>3:5</code>。<br>
+            第三行不是由小到大排序：R 依 3→5→4 把東西放進購物籃。想重排資料時這很好用。
+          </div>
+        </div>
+        <h3>負整數：去掉這些位置</h3>
+        <p>門牌前面加 <code>-</code>，意思是「去掉這些，留下其餘」。不是「取第 −3 個」——R 的位置沒有 0，也沒有負的門牌。</p>
+        <div class="snippet">
+          <div class="bar"><span>去掉某些位置</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x.vec[-3]
+x.vec[c(-3,-4,-5)]
+x.vec[-c(3,4,5)] # Same
+x.vec[-(3:5)] # Same, more succinct (note the parentheses)</code></pre>
+          <div class="out">[1] -0.13592452 -0.04079697 -0.15826244 -2.15663750  0.49864683
+[1] -0.13592452 -0.04079697  0.49864683
+[1] -0.13592452 -0.04079697  0.49864683
+[1] -0.13592452 -0.04079697  0.49864683</div>
+          <div class="why">
+            後三行做同一件事：去掉第 3 到第 5，留下第 1、2、6。<br>
+            <code>-c(3,4,5)</code> 是先合併位置再一次取負；<code>-(3:5)</code> 更短，但括號必要。
+          </div>
+        </div>
+        <div class="card warn">
+          <strong>為什麼一定要寫 <code>-(3:5)</code> 而不能寫 <code>-3:5</code>？</strong>
+          冒號 <code>:</code> 的綁定比一元負號更緊。<code>-3:5</code> 會先變成從 −3 走到 5 的整數向量。把它當索引會報錯：<code>only 0's may be mixed with negative subscripts</code>（負索引不能跟正索引混用）。括號強迫 R 先算 <code>3:5</code>，再對整條取負。
+        </div>
+        <div class="q">
+          <p><b>練習 E3-1。</b>沿用上面的 <code>x.vec</code>（先跑 <code>set.seed(33); x.vec = rnorm(6)</code>）。取出：(a) 最後一個；(b) 第 1 與第 6 個；(c) 去掉頭尾兩個。</p>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>逐步解答</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x.vec[6]
+x.vec[c(1, 6)]
+x.vec[-c(1, 6)]</code></pre>
+          <div class="out">[1] 0.4986468
+[1] -0.1359245  0.4986468
+[1] -0.04079697  1.01053901 -0.15826244 -2.15663750</div>
+          <div class="why">長度 6，最後一個是位置 6。<code>c(1, 6)</code> 一次拿兩端。頭尾是位置 1 與 6，去掉它們用 <code>-c(1, 6)</code>。</div>
+        </div>
+
+        <h3>矩陣上的整數索引</h3>
+        <p>把同一條 6 個數填進 3 列 × 2 欄。R 預設 <span class="term" data-zh="以欄為主">column-major order</span>：先填滿第 1 欄由上到下，再填第 2 欄。</p>
+        <div class="snippet">
+          <div class="bar"><span>matrix 的 [列, 欄]</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x.mat = matrix(x.vec, 3, 2) # column major order
+x.mat
+x.mat[2,2] # Element in 2nd row, 2nd column
+x.mat[5] # Same (column major order)
+x.mat[2,] # Second row
+x.mat[1:2,]
+x.mat[,1] # First column
+x.mat[,-1] # All but first column</code></pre>
+          <div class="out">            [,1]       [,2]
+[1,] -0.13592452 -0.1582624
+[2,] -0.04079697 -2.1566375
+[3,]  1.01053901  0.4986468
+[1] -2.156638
+[1] -2.156638
+[1] -0.04079697 -2.15663750
+            [,1]       [,2]
+[1,] -0.13592452 -0.1582624
+[2,] -0.04079697 -2.1566375
+[1] -0.13592452 -0.04079697  1.01053901
+[1] -0.1582624 -2.1566375  0.4986468</div>
+          <div class="why">
+            <code>matrix(x.vec, 3, 2)</code>：資料、列數、欄數。沒寫 <code>byrow = TRUE</code> 就是以欄為主。<br>
+            <code>[列, 欄]</code>：逗號左邊管列（row），右邊管欄（column）。某一側留空，表示「這一側全要」。<br>
+            <code>x.mat[5]</code>：只用一個數字時，R 把矩陣當一條以欄為主排好的向量。格子順序是 [1,1]、[2,1]、[3,1]、[1,2]、<strong>[2,2]</strong>、[3,2]，所以第 5 格就是 <code>x.mat[2, 2]</code>。<br>
+            取單列或單欄時，R 常會 <span class="term" data-zh="降維">drop</span> 成普通向量，所以 <code>x.mat[, -1]</code> 印出來沒有欄標。若要保住矩陣形狀，加 <code>drop = FALSE</code>（導論陣列章已見）。
+          </div>
+        </div>
+        <div class="q">
+          <p><b>練習 E3-2。</b>沿用 <code>x.mat</code>。取出：(a) 第 3 列第 1 欄；(b) 第 3 列整列；(c) 去掉第 2 列。</p>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>逐步解答</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x.mat[3, 1]
+x.mat[3, ]
+x.mat[-2, ]</code></pre>
+          <div class="out">[1] 1.010539
+[1] 1.0105390 0.4986468
+           [,1]       [,2]
+[1,] -0.1359245 -0.1582624
+[2,]  1.0105390  0.4986468</div>
+          <div class="why">(a) 兩個門牌都寫上。(b) 欄的位置留空。(c) 列用負索引，欄留空。</div>
+        </div>
+
+        <h3>List：<code>[ ]</code> 對 <code>[[ ]]</code></h3>
+        <p>課堂用同一條 <code>x.vec</code>、內建字母表、一條邏輯向量，做成三格 list。</p>
+        <div class="snippet">
+          <div class="bar"><span>單括號留下抽屜，雙括號拿出內容</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x.list = list(x.vec, letters[1:5], c(T,F,F,T,T,F))
+x.list
+x.list[[3]] # values in the Third component
+x.list[3] # Third component, kept as a list
+x.list[1:2]
+x.list[-1]</code></pre>
+          <div class="out">[[1]]
+[1] -0.13592452 -0.04079697  1.01053901 -0.15826244 -2.15663750  0.49864683
+
+[[2]]
+[1] "a" "b" "c" "d" "e"
+
+[[3]]
+[1]  TRUE FALSE FALSE  TRUE  TRUE FALSE
+
+[1]  TRUE FALSE FALSE  TRUE  TRUE FALSE
+[[1]]
+[1]  TRUE FALSE FALSE  TRUE  TRUE FALSE
+
+[[1]]
+[1] -0.13592452 -0.04079697  1.01053901 -0.15826244 -2.15663750  0.49864683
+
+[[2]]
+[1] "a" "b" "c" "d" "e"
+
+[[1]]
+[1] "a" "b" "c" "d" "e"
+
+[[2]]
+[1]  TRUE FALSE FALSE  TRUE  TRUE FALSE
+</div>
+          <div class="why">
+            <code>list(...)</code>：依序把引數收成一串格子，不必同一型別。<br>
+            <code>letters</code> 是 R 內建的 26 個小寫字母向量；<code>letters[1:5]</code> 就是 a 到 e。還有 <code>LETTERS</code>（大寫）。<br>
+            <code>[[3]]</code>：只拿「第 3 格裡面的東西」。印出來沒有外層包裝。<br>
+            <code>[3]</code>：拿「第 3 格這個抽屜」。印出來仍有 <code>[[1]]</code>，因為結果還是 list，只是長度變成 1。<br>
+            <code>[1:2]</code>、<code>[-1]</code>：單括號可以一次對多個位置（含負索引）做事，結果仍是 list。
+          </div>
+        </div>
+        <div class="card warn">
+          <strong>課堂原句：不要用雙括號去做上面兩件事。</strong>
+          Avoid doing either of above commands with double brackets <code>[[ ]]</code>。<code>[[ ]]</code> 設計來取<strong>單一</strong>元件。寫 <code>x.list[[1:2]]</code> 時，R 會做 <span class="term" data-zh="遞迴索引">recursive indexing</span>：先進第 1 格，再取它的第 2 個元素，得到一個數字，完全不是「前兩格」。寫 <code>x.list[[-1]]</code> 則直接報錯。口訣：<strong>多格、去掉某格，用單括號；拿出那一格裡的物件，用雙括號。</strong>
+        </div>
+        <div class="q">
+          <p><b>練習 E3-3。</b>沿用 <code>x.list</code>。(a) 用雙括號取出字母那一格，再取其中第 2 個字母；(b) 用單括號留下第 1 與第 3 格。解釋兩次結果的型別差在哪。</p>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>逐步解答</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x.list[[2]][2]
+x.list[c(1, 3)]</code></pre>
+          <div class="out">[1] "b"
+[[1]]
+[1] -0.13592452 -0.04079697  1.01053901 -0.15826244 -2.15663750  0.49864683
+
+[[2]]
+[1]  TRUE FALSE FALSE  TRUE  TRUE FALSE
+</div>
+          <div class="why">字母是第 2 格。雙括號拿出字元向量，再 <code>[2]</code> 得到 <code>"b"</code>，這已不是 list。單括號 <code>c(1, 3)</code> 得到長度 2 的 list。</div>
+        </div>
+      </section>
+
+      <section class="mod" id="idx-bool">
+        <h2><span class="no">E4 · Iteration 投影片 11–13</span>布林索引與名稱索引</h2>
+        <p>Boolean indexing 一開始比較繞，但非常有用。規則只有一句：<strong>TRUE 留下，FALSE 丟掉</strong>。面具長度通常等於被取的那條向量。</p>
+        <div class="snippet">
+          <div class="bar"><span>手寫面具，看懂規則</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x.vec[c(F,F,T,F,F,F)] # Third element
+x.vec[c(T,T,F,T,T,T)] # All but third element</code></pre>
+          <div class="out">[1] 1.010539
+[1] -0.13592452 -0.04079697 -0.15826244 -2.15663750  0.49864683</div>
+          <div class="why">手寫 <code>T</code>/<code>F</code> 只是為了看懂規則。真正好用的是：先比較，得到面具，再戴上去。</div>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>現算現用：抽出正的元素</span><button class="copy" type="button">複製</button></div>
+          <pre><code>pos.vec = x.vec > 0
+pos.vec
+x.vec[pos.vec]
+x.vec[x.vec > 0] # Same, but more succinct ("on-the-fly")</code></pre>
+          <div class="out">[1] FALSE FALSE  TRUE FALSE FALSE  TRUE
+[1] 1.0105390 0.4986468
+[1] 1.0105390 0.4986468</div>
+          <div class="why">
+            先算 <code>x.vec &gt; 0</code>，得到與 <code>x.vec</code> 等長的邏輯向量；再把它當作索引。<br>
+            課堂把 <code>x.vec[x.vec &gt; 0]</code> 叫做 on-the-fly——你不必先把面具存成 <code>pos.vec</code>，除非稍後還要再用。Works the same way for lists；矩陣的邏輯索引會在 lab 裡練。
+          </div>
+        </div>
+        <div class="q">
+          <p><b>練習 E4-1。</b>沿用 <code>x.vec</code>。用現算現用的布林索引，取出絕對值大於 1 的元素。提示：絕對值函數是 <code>abs()</code>。</p>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>逐步解答</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x.vec[abs(x.vec) > 1]</code></pre>
+          <div class="out">[1]  1.010539 -2.156638</div>
+          <div class="why"><code>abs(x.vec) &gt; 1</code> 對每個元素問「絕對值是否大於 1」。符合的是 1.010539 與 −2.156638。</div>
+        </div>
+
+        <h3>名稱索引</h3>
+        <p>第三種門牌是名字。先有名字，才能用名字。對向量或 list，用 <code>names()</code> 一次貼上。</p>
+        <div class="snippet">
+          <div class="bar"><span>names()、$、字串索引</span><button class="copy" type="button">複製</button></div>
+          <pre><code>names(x.list) = c("normals", "letters", "bools")
+x.list[["letters"]]
+x.list$letters # Same, just using different notation
+x.list[c("normals","bools")]</code></pre>
+          <div class="out">[1] "a" "b" "c" "d" "e"
+[1] "a" "b" "c" "d" "e"
+$normals
+[1] -0.13592452 -0.04079697  1.01053901 -0.15826244 -2.15663750  0.49864683
+
+$bools
+[1]  TRUE FALSE FALSE  TRUE  TRUE FALSE
+</div>
+          <div class="why">
+            <code>names(x.list) = c(...)</code>：把名稱向量貼到每一格。之後印出時，<code>[[1]]</code> 會變成 <code>$normals</code>。<br>
+            <code>[["letters"]]</code>：雙括號 + 字串 = 按名拿出裡面的物件。<br>
+            <code>$letters</code>：錢字符號 <code>$</code> 是快捷寫法，等價於 <code>[["letters"]]</code>。名字必須是合法的 R 名稱（不要有空格），而且一次只能取一格。<br>
+            <code>x.list[c("normals", "bools")]</code>：單括號 + 多名 = 留下這幾格，結果仍是 list。不能寫 <code>x.list[[c("normals", "bools")]]</code>。
+          </div>
+        </div>
+        <div class="card note">Lab 會練習 <code>rownames()</code>、<code>colnames()</code> 以及矩陣的具名索引。對 data frame，按欄名取值非常常用，例如 <code>patients$age</code>。名稱跟著那一欄走，不怕插入一欄之後位置全亂。</div>
+        <div class="q">
+          <p><b>練習 E4-2。</b>沿用已取名的 <code>x.list</code>。用 <code>$</code> 取出 <code>bools</code> 當面具，從 <code>normals</code> 裡留下對應為 TRUE 的數字。</p>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>逐步解答</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x.list$normals[x.list$bools]</code></pre>
+          <div class="out">[1] -0.1359245 -0.1582624 -2.1566375</div>
+          <div class="why">TRUE 在位置 1、4、5，所以留下這三個數。這是「名稱索引 + 布林索引」疊在一起。</div>
+        </div>
+      </section>
+
+      <section class="mod" id="control">
+        <h2><span class="no">E5 · Iteration 投影片 14–17</span>流程控制：if / else / else if</h2>
+        <p><span class="term" data-zh="流程控制">Control flow</span> 工具通常接受一個 <span class="term" data-zh="條件">condition</span> 當輸入，再依這個條件的布林值決定下一步。與索引不同：<code>if()</code> 要的是<strong>一個</strong> TRUE 或 FALSE，不是一排面具。</p>
+        <table>
+          <thead><tr><th>寫法</th><th>角色</th></tr></thead>
+          <tbody>
+            <tr><td><code>if()</code>、<code>else if()</code>、<code>else</code></td><td>標準條件句：檢查一個是非，再決定跑哪一塊</td></tr>
+            <tr><td><code>ifelse()</code></td><td>條件函數，而且可以向量化</td></tr>
+            <tr><td><code>switch()</code></td><td>在好幾個選項裡挑一個</td></tr>
+          </tbody>
+        </table>
+        <h3>if() 與 else</h3>
+        <p>日常語言：如果條件成立，做甲；否則做乙。<code>else</code> 可以省略——沒有「否則」時，條件不成立就什麼都不做。單行動作可以省略花括號 <code>{ }</code>。</p>
+        <div class="card syntax">
+          <p style="margin:0"><code>if (條件) {  TRUE 時跑的程式 } else {  FALSE 時跑的程式 }</code></p>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>非負就留下 x，否則留下 -x（絕對值）</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x = 0.5
+if (x >= 0) {
+  x
+} else {
+  -x
+}
+if (x >= 0) x else -x</code></pre>
+          <div class="out">[1] 0.5
+[1] 0.5</div>
+          <div class="why">
+            <code>if</code> 是關鍵字，不是函數名，但後面仍要括號。括號裡必須算出<strong>單一</strong> TRUE 或 FALSE。<code>&gt;=</code> 是「大於或等於」。<br>
+            花括號包住「這一支路要跑的多行程式」，稱為 <span class="term" data-zh="區塊">block</span>。<br>
+            Console 裡，R 發現這句還沒寫完，會把提示符暫時改成 <code>+</code>。那個 <code>+</code> 不是加法，是 <span class="term" data-zh="續行提示">continuation prompt</span>。你不必自己打 <code>+</code>。<br>
+            整個 <code>if</code> 表達式的值，等於被選中那一支的最後一個值。
+          </div>
+        </div>
+        <div class="q">
+          <p><b>練習 E5-1。</b>令 <code>temp &lt;- -3</code>。若 <code>temp</code> 小於 0，結果取 <code>-temp</code>，否則取 <code>temp</code>。寫完整 <code>if / else</code>。</p>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>逐步解答</span><button class="copy" type="button">複製</button></div>
+          <pre><code>temp &lt;- -3
+if (temp &lt; 0) {
+  -temp
+} else {
+  temp
+}</code></pre>
+          <div class="out">[1] 3</div>
+          <div class="why">條件 <code>temp &lt; 0</code> 為 TRUE，走第一支，回傳 <code>-temp</code>，也就是 3。這又是一次絕對值。</div>
+        </div>
+
+        <h3>else if()：一條以上的岔路</h3>
+        <p><code>else if()</code> 可以接在 <code>if()</code> 後面任意多次。R 由上往下問：第一個條件是 TRUE 嗎？是就做完離開；不是，才問下一個。最後的 <code>else</code> 仍然可有可無。</p>
+        <div class="snippet">
+          <div class="bar"><span>三岔路</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x = -2
+if (x^2 &lt; 4) {
+  x^2
+} else if (x &gt;= 1) {
+  2*x-1
+} else {
+  -2*x+1
+}</code></pre>
+          <div class="out">[1] 5</div>
+          <div class="why">
+            <code>x^2</code> 是 <code>(-2)^2 = 4</code>，<code>4 &lt; 4</code> 為 FALSE，第一支不走。<br>
+            接著 <code>x &gt;= 1</code>？−2 不 ≥ 1，第二支不走。<br>
+            於是走 <code>else</code>：<code>-2 * x + 1 = -2 * (-2) + 1 = 5</code>。<br>
+            <code>^</code> 是次方，比乘法更先算。Each <code>else if()</code> only gets considered if the conditions above it were not TRUE.
+          </div>
+        </div>
+        <div class="q">
+          <p><b>練習 E5-2。</b>令 <code>x &lt;- 3</code>，跑與課堂相同的三岔路。預測答案，並說明為什麼不會走到 <code>else</code>。</p>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>逐步解答</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x &lt;- 3
+if (x^2 &lt; 4) {
+  x^2
+} else if (x &gt;= 1) {
+  2*x-1
+} else {
+  -2*x+1
+}</code></pre>
+          <div class="out">[1] 5</div>
+          <div class="why"><code>3^2 = 9</code>，<code>9 &lt; 4</code> 為 FALSE。接著 <code>3 &gt;= 1</code> 為 TRUE，走第二支：<code>2 * 3 - 1 = 5</code>。因為第二支已經成立，R 不會再看 <code>else</code>。</div>
+        </div>
+      </section>
+
+      <section class="mod" id="ifelse">
+        <h2><span class="no">E6 · Iteration 投影片 18–20</span>ifelse() 與 switch()</h2>
+        <p><code>ifelse()</code> 是一個函數（注意有括號、有引數），固定三個位置：① 條件；② 條件成立時的回傳值；③ 條件不成立時的回傳值。</p>
+        <div class="snippet">
+          <div class="bar"><span>三個引數的快速決定</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x = -2
+ifelse(x &gt; 0, "x&gt;0", "x&lt;=0")
+x = 2
+ifelse(x &gt; 0, "x&gt;0", "x&lt;=0")
+x = -2
+ifelse(x &gt; 0, x, -x) # take absolute value</code></pre>
+          <div class="out">[1] "x&lt;=0"
+[1] "x>0"
+[1] 2</div>
+          <div class="why">第一個引數是條件，第二個是 TRUE 時給的東西，第三個是 FALSE 時給的東西。最後一行用它做絕對值。</div>
+        </div>
+        <p>它真正的威力在向量化：條件可以是一排 TRUE/FALSE，R 對每個位置各做一次選擇。課堂稱之為 <span class="term" data-zh="逐元素比較與運算">elementwise comparison and operation</span>。</p>
+        <div class="snippet">
+          <div class="bar"><span>對整條向量逐格選擇</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x.vec &lt;- 1:6
+x.vec
+x.vec^2
+ifelse(x.vec^2 > 1, 2*x.vec-1, x.vec^2)</code></pre>
+          <div class="out">[1] 1 2 3 4 5 6
+[1]  1  4  9 16 25 36
+[1]  1  3  5  7  9 11</div>
+          <div class="why">
+            對 1：<code>1^2 &gt; 1</code> 為 FALSE，留下平方 1。對 2：<code>4 &gt; 1</code> 為 TRUE，改用 <code>2*2-1 = 3</code>。後面依此得到奇數 1, 3, 5, 7, 9, 11。<br>
+            若改寫成 <code>if (x.vec^2 &gt; 1) ...</code> 會失敗：<code>if()</code> 拒絕長度大於 1 的條件。
+          </div>
+        </div>
+        <div class="card exam">要決定「整段程式走甲或走乙」（例如要不要畫圖），用 <code>if / else</code>。要對一排數字各做一次選擇（及格標記、取絕對值），用 <code>ifelse()</code>。</div>
+        <div class="q">
+          <p><b>練習 E6-1。</b>令 <code>w &lt;- c(-2, 0, 5)</code>。用 <code>ifelse()</code> 把正數改成字串 <code>"pos"</code>，其餘改成 <code>"not pos"</code>。</p>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>逐步解答</span><button class="copy" type="button">複製</button></div>
+          <pre><code>w &lt;- c(-2, 0, 5)
+ifelse(w &gt; 0, "pos", "not pos")</code></pre>
+          <div class="out">[1] "not pos" "not pos" "pos"    </div>
+          <div class="why">條件是 <code>w &gt; 0</code>，得到 FALSE, FALSE, TRUE。第三個位置換 "pos"，前兩個換 "not pos"。</div>
+        </div>
+
+        <h3>switch()：依標籤挑做法</h3>
+        <p>若你發現自己在寫 <code>if</code> 接一長串 <code>else if</code>，而且條件都是「某個字串等於什麼」，可以改用 <code>switch()</code>。先把要判別的變數傳進去，再為每個可能的值準備一個具名選項；最後一個不具名的引數當作 <code>else</code>。</p>
+        <div class="snippet">
+          <div class="bar"><span>type.of.summary 不在名單裡</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x.vec &lt;- 1:6
+type.of.summary = "mode"
+switch(type.of.summary,
+       mean=mean(x.vec),
+       median=median(x.vec),
+       histogram=hist(x.vec),
+       "I don't understand")</code></pre>
+          <div class="out">[1] "I don't understand"</div>
+          <div class="why">
+            我們預期 <code>type.of.summary</code> 是 <code>"mean"</code>、<code>"median"</code> 或 <code>"histogram"</code>。這裡故意設成 <code>"mode"</code>（眾數），不在名單裡。<br>
+            <code>mean = mean(x.vec)</code>：等號左邊是標籤，右邊是匹配成功時要算出的值。第一個 <code>mean</code> 是名字，第二個是函數。<br>
+            <code>median()</code> 是中位數；<code>hist()</code> 畫直方圖（有副作用：會在 Plots 窗格出圖）。<br>
+            最後一個引數沒有名字，充當 else。
+          </div>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>改成 "mean" 再試</span><button class="copy" type="button">複製</button></div>
+          <pre><code>type.of.summary = "mean"
+switch(type.of.summary,
+       mean=mean(x.vec),
+       median=median(x.vec),
+       histogram=hist(x.vec),
+       "I don't understand")</code></pre>
+          <div class="out">[1] 3.5</div>
+          <div class="why">課堂要你改 <code>type.of.summary</code> 試試看。換成 <code>"mean"</code> 得到 3.5（1 到 6 的平均）；換成 <code>"median"</code> 也是 3.5。</div>
+        </div>
+        <div class="q">
+          <p><b>練習 E6-2。</b>把 <code>type.of.summary</code> 設成 <code>"median"</code>，對 <code>x.vec &lt;- 1:6</code> 跑與課堂相同的 <code>switch()</code>。再設成 <code>"sum"</code>，預測會印什麼。</p>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>逐步解答</span><button class="copy" type="button">複製</button></div>
+          <pre><code>x.vec &lt;- 1:6
+type.of.summary = "median"
+switch(type.of.summary, mean=mean(x.vec), median=median(x.vec), histogram=hist(x.vec), "I don't understand")
+type.of.summary = "sum"
+switch(type.of.summary, mean=mean(x.vec), median=median(x.vec), histogram=hist(x.vec), "I don't understand")</code></pre>
+          <div class="out">[1] 3.5
+[1] "I don't understand"</div>
+          <div class="why"><code>"median"</code> 命中第二個標籤，中位數是 3.5。<code>"sum"</code> 不在名單裡，走無名引數。若要支援加總，必須自己加一條 <code>sum = sum(x.vec)</code>。</div>
+        </div>
+      </section>
+
+      <section class="mod" id="bool-lazy">
+        <h2><span class="no">E7 · Iteration 投影片 21–22</span>布林運算子與懶惰運算</h2>
+        <p>導論已見 <code>&amp;</code>（且）與 <code>|</code>（或）：它們是 <span class="term" data-zh="逐元素">elementwise</span> 的。這一講用它來做「同時滿足兩個不等式」的篩選。</p>
+        <div class="snippet">
+          <div class="bar"><span>取出落在 [−0.5, 0.5] 的亂數</span><button class="copy" type="button">複製</button></div>
+          <pre><code>set.seed(33)
+x.vec = rnorm(6)
+u.vec = runif(10, -1, 1)
+u.vec
+-0.5 &lt;= u.vec &amp; u.vec &lt;= 0.5
+u.vec[-0.5 &lt;= u.vec &amp; u.vec &lt;= 0.5]</code></pre>
+          <div class="out"> [1] -0.5498976 -0.3152276  0.5637759  0.6864934  0.5494977 -0.2256140
+ [7] -0.7284699  0.8007152  0.1329053 -0.9145317
+ [1] FALSE  TRUE FALSE FALSE FALSE  TRUE FALSE FALSE  TRUE FALSE
+[1] -0.3152276 -0.2256140  0.1329053</div>
+          <div class="why">
+            先跑 <code>set.seed(33); rnorm(6)</code>，亂數種子才會對上課堂的 <code>u.vec</code>。<br>
+            <code>runif(10, -1, 1)</code>：從 <span class="term" data-zh="均勻分布">uniform</span> 抽出 10 個數，下限 −1、上限 1。<br>
+            <code>-0.5 &lt;= u.vec &amp; u.vec &lt;= 0.5</code>：同時問「≥ −0.5」且「≤ 0.5」。<code>&amp;</code> 兩側各是一條長度 10 的邏輯向量，逐位置做 AND。<br>
+            方括號裡是布林面具，不是「去掉第 0.5 個」。負號黏在 <code>0.5</code> 上，表示負的零點五。
+          </div>
+        </div>
+        <p>另外一對運算子是 <code>&amp;&amp;</code> 與 <code>||</code>。它們只回傳<strong>一個</strong>布林值，而且是 <span class="term" data-zh="懶惰">lazy</span> 的：一旦左邊已經能決定答案，右邊根本不算。</p>
+        <div class="snippet">
+          <div class="bar"><span>左邊已能決定，右邊即使會報錯也不算</span><button class="copy" type="button">複製</button></div>
+          <pre><code>(0 &gt; 0) &amp;&amp; all(matrix(0,2,2) == matrix(0,3,3))
+(0 &gt; 0) &amp;&amp; (ThisVariableIsNotDefined == 0)
+(1 > 0) || (ThisVariableIsNotDefined == 0)</code></pre>
+          <div class="out">[1] FALSE
+[1] FALSE
+[1] TRUE</div>
+          <div class="why">
+            <code>0 &gt; 0</code> 是 FALSE。對 AND 來說，左邊已是 FALSE，整個答案必是 FALSE，於是右邊不執行。<br>
+            <code>matrix(0,2,2) == matrix(0,3,3)</code> 其實會因維度不合而報錯；<code>ThisVariableIsNotDefined</code> 也不存在。但因為懶惰，R 根本沒走到它們。<br>
+            第三行同理：<code>1 &gt; 0</code> 已是 TRUE，OR 不必看右邊。<br>
+            若把第一行左右對調，右邊會先算，立刻報錯。課堂問 what if we switch the order，答案就是：懶惰保不住你了。
+          </div>
+        </div>
+        <div class="card exam">課堂口訣：Flow control requires one Boolean value and skip unnecessary operations。Rule of thumb：索引或 <span class="term" data-zh="取子集">subsetting</span> 用 <code>&amp;</code> 與 <code>|</code>；<code>if()</code> 這類條件句用 <code>&amp;&amp;</code> 與 <code>||</code>。</div>
+        <div class="q">
+          <p><b>練習 E7-1。</b>沿用課堂的 <code>u.vec</code>。取出同時滿足「大於 0」且「小於 0.6」的元素。這題該用 <code>&amp;</code> 還是 <code>&amp;&amp;</code>？為什麼？</p>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>逐步解答</span><button class="copy" type="button">複製</button></div>
+          <pre><code>u.vec[u.vec &gt; 0 &amp; u.vec &lt; 0.6]</code></pre>
+          <div class="out">[1] 0.5637759 0.5494977 0.1329053</div>
+          <div class="why">這是對一排數字做面具，必須用逐元素的 <code>&amp;</code>。<code>&amp;&amp;</code> 只看每側第一個值，不能當索引。</div>
+        </div>
+      </section>
+
+      <section class="mod" id="for-loop">
+        <h2><span class="no">E8 · Iteration 投影片 23–28</span>迭代與 for() 迴圈</h2>
+        <p class="subhead">課堂原句：Computers: good at applying rigid rules over and over again. Humans: not so good at this. Iteration is at the heart of programming.</p>
+        <p>白話：電腦最擅長把同一條死板規則重複做一千次；人最不擅長這個。<span class="term" data-zh="迭代">Iteration</span> 就是「重複做」。</p>
+        <table>
+          <thead><tr><th>方法</th><th>課堂定位</th></tr></thead>
+          <tbody>
+            <tr><td><code>for()</code>、<code>while()</code> 迴圈</td><td>標準 <span class="term" data-zh="迴圈結構">loop constructs</span></td></tr>
+            <tr><td><span class="term" data-zh="向量化">Vectorization</span></td><td>能用就用！通常更快、也更短</td></tr>
+            <tr><td>apply family</td><td>base R 裡用來替代許多 <code>for()</code> 的一組函數，稍後會見</td></tr>
+            <tr><td>map family（<code>purrr</code> 套件）</td><td>另一種替代寫法，稍後會見</td></tr>
+          </tbody>
+        </table>
+        <h3>for()：計數器沿著向量走</h3>
+        <p>一個 <code>for()</code> 迴圈會讓 <span class="term" data-zh="計數器變數">counter variable</span> 沿著一條向量往前走。每走到一個值，就把 <span class="term" data-zh="迴圈本體">body</span>（花括號裡的程式）跑一遍，直到向量走完。</p>
+        <div class="card syntax">
+          <p style="margin:0"><code>for (計數器 in 向量) { 本體 }</code></p>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>把 1 到 10 的自然對數存進預先準備的向量</span><button class="copy" type="button">複製</button></div>
+          <pre><code>n = 10
+log.vec = vector(length=n, mode="numeric")
+for (i in 1:n) {
+  log.vec[i] = log(i)
+}
+log.vec</code></pre>
+          <div class="out"> [1] 0.0000000 0.6931472 1.0986123 1.3862944 1.6094379 1.7917595 1.9459101
+ [8] 2.0794415 2.1972246 2.3025851</div>
+          <div class="why">
+            <code>n = 10</code>：迴圈要走幾步，先放進一個名字。之後若要改成 20，只改這裡。<br>
+            <code>vector(length = n, mode = "numeric")</code>：造一條長度 n、模式為數值的向量。預設全是 0。這叫做 <span class="term" data-zh="預先配置">preallocation</span>：先把格子擺好再填，比迴圈裡反覆 <code>c()</code> 加長更有效率。<br>
+            <code>for (i in 1:n)</code>：<code>i</code> 是計數器；<code>in</code> 是關鍵字，讀作「沿著」；<code>1:n</code> 是它要走的向量。每一輪，<code>i</code> 會被設成當下那個整數。<br>
+            <code>log.vec[i] = log(i)</code>：左邊用 <code>i</code> 當位置，右邊對 <code>i</code> 取自然對數。<code>log(1) = 0</code>，所以第一格是 0。
+          </div>
+        </div>
+        <div class="q">
+          <p><b>練習 E8-1。</b>用 <code>for</code> 把 1 到 5 的平方存進 <code>sq</code>。先用 <code>vector()</code> 準備長度 5 的數值向量。</p>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>逐步解答</span><button class="copy" type="button">複製</button></div>
+          <pre><code>sq = vector(length = 5, mode = "numeric")
+for (i in 1:5) {
+  sq[i] = i^2
+}
+sq</code></pre>
+          <div class="out">[1]  1  4  9 16 25</div>
+          <div class="why">計數器走 <code>1:5</code>。本體：<code>sq[i] = i^2</code>。</div>
+        </div>
+
+        <h3>提早離開：break</h3>
+        <p>關鍵字 <code>break</code> 的意思是：「立刻離開目前這個迴圈，不要再進入下一輪。」</p>
+        <div class="snippet">
+          <div class="bar"><span>對數一超過 2 就停</span><button class="copy" type="button">複製</button></div>
+          <pre><code>n = 10
+log.vec = vector(length=n, mode="numeric")
+for (i in 1:n) {
+  if (log(i) &gt; 2) {
+    cat("I don't like numbers bigger than 2\n")
+    break
+  }
+  log.vec[i] = log(i)
+}
+log.vec</code></pre>
+          <div class="out">I don't like numbers bigger than 2
+ [1] 0.0000000 0.6931472 1.0986123 1.3862944 1.6094379 1.7917595 1.9459101
+ [8] 0.0000000 0.0000000 0.0000000</div>
+          <div class="why">
+            <code>log(i) &gt; 2</code> 第一次成立是在 <code>i = 8</code>（<code>log(7) ≈ 1.95</code>，<code>log(8) ≈ 2.08</code>）。那一輪先 <code>cat</code> 印一句話，再 <code>break</code>，所以 <code>log.vec[8] = log(8)</code> 根本沒執行。格子 8、9、10 仍是 <code>vector()</code> 預先填的 0。<br>
+            <code>cat()</code> 讀作 concatenate and print：直接把字送到 Console，不像 <code>print()</code> 會加 <code>[1]</code> 和引號。<code>\n</code> 是 <span class="term" data-zh="換行">newline</span>。
+          </div>
+        </div>
+
+        <h3>非數字計數器、巢狀迴圈</h3>
+        <p>計數器永遠是「沿著一條向量走」，但那條向量不必是數字。</p>
+        <div class="snippet">
+          <div class="bar"><span>字串當計數器</span><button class="copy" type="button">複製</button></div>
+          <pre><code>for (str in c("AC1", "AC2", "AC3")) {
+  cat(paste(str, "canteen is awesome!\n"))
+}</code></pre>
+          <div class="out">AC1 canteen is awesome!
+AC2 canteen is awesome!
+AC3 canteen is awesome!</div>
+          <div class="why">
+            <code>str</code> 只是名字，課堂用它提醒你「這一輪拿到的是字串」。<br>
+            <code>paste()</code>：把引數黏成一句話，預設中間加空格。城大食堂的 AC1 / AC2 / AC3 只是例子：同一句話對三個名字各說一次。
+          </div>
+        </div>
+        <p>本體裡可以再放一個（或好幾個）<code>for</code>。外圈走一步，內圈可以走完整輪。</p>
+        <div class="snippet">
+          <div class="bar"><span>巢狀：外圈管行、內圈管一格</span><button class="copy" type="button">複製</button></div>
+          <pre><code>for (i in 1:4) {
+  for (j in 1:i^2) {
+    cat(j," ")
+  }
+  cat("\n")
+}</code></pre>
+          <div class="out">1  
+1  2  3  4  
+1  2  3  4  5  6  7  8  9  
+1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  16  </div>
+          <div class="why">外圈 <code>i</code> 依序為 1, 2, 3, 4。內圈走 <code>1:i^2</code>，也就是 1:1、1:4、1:9、1:16。四行的長度正好是平方數。每一輪內圈把數字印在同一行；外圈本體結束前 <code>cat("\n")</code> 換行。</div>
+        </div>
+        <div class="q">
+          <p><b>練習 E8-2。</b>用非數字計數器，對 <code>c("Mon", "Tue", "Wed")</code> 各印一行 <code>Today is Mon</code> 這種句子。用 <code>paste()</code> 與 <code>cat()</code>。</p>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>逐步解答</span><button class="copy" type="button">複製</button></div>
+          <pre><code>for (day in c("Mon", "Tue", "Wed")) {
+  cat(paste("Today is", day, "\n"))
+}</code></pre>
+          <div class="out">Today is Mon 
+Today is Tue 
+Today is Wed </div>
+          <div class="why">計數器沿著三個星期幾走。每一輪 <code>paste("Today is", day)</code> 再換行。</div>
+        </div>
+      </section>
+
+      <section class="mod" id="while-loop">
+        <h2><span class="no">E9 · Iteration 投影片 29–32</span>while()、repeat、什麼算 TRUE</h2>
+        <p><code>while()</code> 的意思是：「只要條件還是 TRUE，就把本體再跑一次。」它不管你走了幾步，只問「還要繼續嗎？」</p>
+        <div class="snippet">
+          <div class="bar"><span>做到對數還不超過 2 為止</span><button class="copy" type="button">複製</button></div>
+          <pre><code>i = 1
+log.vec = c()
+while (log(i) &lt;= 2) {
+  log.vec = c(log.vec, log(i))
+  i = i+1
+}
+log.vec</code></pre>
+          <div class="out">[1] 0.0000000 0.6931472 1.0986123 1.3862944 1.6094379 1.7917595 1.9459101</div>
+          <div class="why">
+            <code>i = 1</code>：計數器要自己先有一個起始值。不像 <code>for</code> 會自動從向量頭走到尾。<br>
+            <code>log.vec = c()</code>：從一條空向量開始，邊跑邊加長。<br>
+            <code>while (log(i) &lt;= 2)</code>：每一輪開始前先問。TRUE 才進本體。<br>
+            <code>c(log.vec, log(i))</code>：把新算出的對數接到舊向量後面。<br>
+            <code>i = i + 1</code>：務必自己把計數器往前推。忘記這一行，條件永遠成立，就變成 <span class="term" data-zh="無限迴圈">infinite loop</span>。那時按 Console 的 Stop，或快捷鍵 Esc。<br>
+            這裡沒有預先配置 10 格。條件在 <code>i = 8</code> 時不進本體，所以沒有「空著的 0」。
+          </div>
+        </div>
+        <div class="card teacher">
+          <strong>for() versus while()。</strong>
+          <code>for()</code> 較適合「重複次數事先就清楚」；<code>while()</code> 較適合「走到那裡才認得出該停」。<code>while()</code> 更一般：每一個 <code>for</code> 都能改寫成 <code>while</code>，反之不然。例如 <code>for (i in 1:n) log.vec[i] = log(i)</code> 等價於 <code>i = 1; while (i &lt;= n) { log.vec[i] = log(i); i = i + 1 }</code>。
+        </div>
+        <div class="q">
+          <p><b>練習 E9-1。</b>用 <code>while</code> 把 <code>i</code> 從 1 加到剛好超過 20 為止，並把沿途的 <code>i</code> 存進 <code>vals</code>。最後的 <code>i</code> 是多少？</p>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>逐步解答</span><button class="copy" type="button">複製</button></div>
+          <pre><code>i = 1
+vals = c()
+while (i &lt;= 20) {
+  vals = c(vals, i)
+  i = i + 1
+}
+vals
+i</code></pre>
+          <div class="out"> [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20
+[1] 21</div>
+          <div class="why">條件寫 <code>i &lt;= 20</code>。本體先存再加一。離開迴圈時 i 已經變成 21，但 21 沒被存進 <code>vals</code>。</div>
+        </div>
+
+        <h3>while(TRUE) 與 repeat</h3>
+        <p><code>while (TRUE)</code> 與 <code>repeat</code> 做同一件事：把本體無限重複，直到裡面有東西把流程打斷（通常是 <code>break</code>）。</p>
+        <div class="snippet">
+          <div class="bar"><span>先做，再問要不要停</span><button class="copy" type="button">複製</button></div>
+          <pre><code>i = 1
+log.vec = c()
+repeat {
+  log.vec = c(log.vec, log(i))
+  i = i+1
+  if (log(i) &gt; 2) break
+}
+log.vec</code></pre>
+          <div class="out">[1] 0.0000000 0.6931472 1.0986123 1.3862944 1.6094379 1.7917595 1.9459101</div>
+          <div class="why">
+            結構相反：<code>while</code> 是「先問再做」；<code>repeat</code> 是「先做，再問要不要停」。所以 <code>break</code> 寫在本體末尾，問的是「下一輪的 i 還合不合格」。<br>
+            結果剛好與課堂的 <code>while</code> 相同，因為 <code>log(8) &gt; 2</code> 時 i 已經加到 8，但 8 的對數還沒被接進去。
+          </div>
+        </div>
+        <div class="card warn"><strong>一定要有逃生口。</strong><code>repeat</code> 或 <code>while (TRUE)</code> 裡如果漏了 <code>break</code>（或條件永遠不成立），程式會一直跑。這不是 R 壞掉，是你沒給它停的理由。</div>
+
+        <h3>什麼會被當成 TRUE？</h3>
+        <table>
+          <thead><tr><th>寫法</th><th>被當成</th></tr></thead>
+          <tbody>
+            <tr><td><code>1</code>、<code>"TRUE"</code></td><td>TRUE</td></tr>
+            <tr><td><code>0</code>、<code>"FALSE"</code></td><td>FALSE</td></tr>
+            <tr><td>大多數其他東西</td><td>報錯，或得到 NA</td></tr>
+          </tbody>
+        </table>
+        <div class="snippet">
+          <div class="bar"><span>1 / 0 / "TRUE" 會被解釋成是非</span><button class="copy" type="button">複製</button></div>
+          <pre><code>ifelse(1,"a","b")
+ifelse(0,"a","b")
+ifelse("TRUE","a","b")</code></pre>
+          <div class="out">[1] "a"
+[1] "b"
+[1] "a"</div>
+          <div class="why">課堂勸告：Don't play games here。盡量讓流程控制拿到真正的布林值。<code>if (1)</code> 能跑，<code>if ("hello")</code> 會報 <code>argument is not interpretable as logical</code>。正式程式請寫 <code>TRUE</code> / <code>FALSE</code> 或比較運算的結果。</div>
+        </div>
+      </section>
+
+      <section class="mod" id="vectorize">
+        <h2><span class="no">E10 · Iteration 投影片 33–37</span>少寫迴圈：向量化</h2>
+        <p>課堂警告：有些人會過度使用 <code>for()</code> 與 <code>while()</code>。它們不是永遠必要。Remember vectorization should be used whenever possible（能向量化就向量化）。</p>
+        <h3>同一個加法，兩種寫法</h3>
+        <p>在 C、C++、Fortran 這類語言裡，兩條向量相加通常要自己寫迴圈。R 把這件事做成內建運算。</p>
+        <div class="snippet">
+          <div class="bar"><span>迴圈加法 vs a + b</span><button class="copy" type="button">複製</button></div>
+          <pre><code>a &lt;- 1:5
+b &lt;- 4:8
+vec_sum &lt;- vector(mode = "numeric", length = length(a))
+for (i in 1:length(vec_sum)) { vec_sum[i] &lt;- a[i] + b[i] }
+vec_sum
+a + b</code></pre>
+          <div class="out">[1]  5  7  9 11 13
+[1]  5  7  9 11 13</div>
+          <div class="why">
+            <code>length(a)</code>：向量有幾個元素。這裡是 5。<br>
+            <code>1:length(vec_sum)</code>：造出 1 到 5，當計數器的軌道。這是「我要走遍每一格」的典型寫法。<br>
+            <code>a + b</code>：R 對兩條等長向量逐位置相加。Python、MATLAB 也有類似的向量化。兩種寫法答案相同，但第二種才是 R 的習慣。
+          </div>
+        </div>
+        <div class="grid-3">
+          <article class="card exam"><h4>Clarity 清楚</h4><p>語法直接說「我們在做什麼」（把 a 與 b 相加），而不是「我們怎麼一格一格做」。</p></article>
+          <article class="card exam"><h4>Concision 簡潔</h4><p>字比較少，出錯的縫也比較少。</p></article>
+          <article class="card exam"><h4>Speed 速度</h4><p>在 R 裡反覆改一條很長的向量很慢；向量化會把工作交給底層已優化的程式（通常是 C）。</p></article>
+        </div>
+        <h3>許多內建函數已經向量化</h3>
+        <div class="snippet">
+          <div class="bar"><span>abs / log / exp 一次吃整條</span><button class="copy" type="button">複製</button></div>
+          <pre><code>abs(-3:3)
+log(1:6)
+exp(1:6)</code></pre>
+          <div class="out">[1] 3 2 1 0 1 2 3
+[1] 0.0000000 0.6931472 1.0986123 1.3862944 1.6094379 1.7917595
+[1]   2.718282   7.389056  20.085537  54.598150 148.413159 403.428793</div>
+          <div class="why">對回 p.25 那個 for：課堂用迴圈填 <code>log.vec</code>，是為了教迴圈結構。同一件事的向量化寫法就是 <code>log(1:10)</code>。以後看到「對每個元素做同一函數」，先問：這個函數是不是已經向量化？是的話，不必寫 <code>for</code>。</div>
+        </div>
+        <div class="card note">什麼時候還是該寫迴圈：下一步依賴上一步的結果（例如模擬一條隨機過程、累加到超過門檻就停），或每一輪要做的事無法寫成「對整條向量一次性運算」（例如讀一堆檔名不同的檔案）。<code>apply()</code> 與 <code>**ply()</code> 課堂預告稍後再見。</div>
+        <div class="q">
+          <p><b>練習 E10-1。</b>不要寫迴圈。計算：(a) <code>c(2, 4, 6)</code> 與 <code>c(10, 20, 30)</code> 逐項相加；(b) <code>exp(0:3)</code>。解釋為什麼 (b) 的第一個數是 1。</p>
+        </div>
+        <div class="snippet">
+          <div class="bar"><span>逐步解答</span><button class="copy" type="button">複製</button></div>
+          <pre><code>c(2, 4, 6) + c(10, 20, 30)
+exp(0:3)</code></pre>
+          <div class="out">[1] 12 24 36
+[1]  1.000000  2.718282  7.389056 20.085537</div>
+          <div class="why">(a) 直接 <code>+</code>。(b) <code>exp</code> 是 e 的次方，<code>exp(0) = e^0 = 1</code>。後面依序是 e、e²、e³。</div>
+        </div>
+
+        <h3>本講總結（Iteration 投影片 37）</h3>
+        <ol>
+          <li>向量、矩陣、data frame、list 都有三種索引：整數、布林、名稱。</li>
+          <li>現算現用的布林索引非常有用。典型寫法：<code>x[x &gt; 0]</code>。</li>
+          <li>具名索引對 data frame 特別重要。欄名比位置穩。</li>
+          <li>List 的索引要小心 <code>[ ]</code> 與 <code>[[ ]]</code>。單括號留下子 list；雙括號拿出裡面的物件。多格不要用雙括號。</li>
+          <li><code>if()</code>、<code>else if()</code>、<code>else</code> 是標準條件句。條件必須是單一 TRUE/FALSE。</li>
+          <li><code>ifelse()</code> 是 <code>if / else</code> 的捷徑，而且能向量化。</li>
+          <li><code>switch()</code> 是一長串 <code>if / else if / else</code> 的捷徑，適合依字串標籤挑做法。</li>
+          <li><code>for()</code>、<code>while()</code>、<code>repeat</code> 是標準迴圈。<code>break</code> 用來提早停。<code>for</code> 適合已知軌道，<code>while</code> 適合已知停的條件。</li>
+          <li>不要過度使用顯式 <code>for</code>。向量化是朋友。<code>apply()</code> 與 <code>**ply()</code> 稍後會見。</li>
+        </ol>
+        <div class="card exam">給零基礎的第二張小抄：① 取出東西只有整數／布林／名稱三條路；② list 多格用 <code>[ ]</code>、拿出內容用 <code>[[ ]]</code> 或 <code>$</code>；③ <code>if</code> 管「整段走哪條」，<code>ifelse</code> 管「每個元素選哪個」；④ 索引用 <code>&amp; |</code>，條件句用 <code>&amp;&amp; ||</code>；⑤ 對整條向量做同一件事，先試向量化，再考慮寫迴圈。</div>
+      </section>
+
+      <section class="mod" id="glossary">
+        <h2><span class="no">PART F · UNIT F1</span>詞彙表</h2>
+        <input class="search" id="glossary-search" placeholder="搜尋英文或中文…" />
+        <div class="glossary-grid">
+          <div class="g-item"><span class="en">object</span><span class="zh">物件</span><p>R 裡一切東西：資料或函數。</p></div>
+          <div class="g-item"><span class="en">argument</span><span class="zh">引數</span><p>丟進函數的輸入。</p></div>
+          <div class="g-item"><span class="en">return value</span><span class="zh">回傳值</span><p>函數吐出的輸出物件。</p></div>
+          <div class="g-item"><span class="en">side effect</span><span class="zh">副作用</span><p>除了回傳值以外對外界的改變。</p></div>
+          <div class="g-item"><span class="en">bit</span><span class="zh">位元</span><p>資訊的最小單位，0/1。</p></div>
+          <div class="g-item"><span class="en">Boolean</span><span class="zh">邏輯值</span><p>TRUE 或 FALSE。</p></div>
+          <div class="g-item"><span class="en">double</span><span class="zh">雙精度浮點數</span><p>R 裡一般數字的預設型別。</p></div>
+          <div class="g-item"><span class="en">NA / NaN</span><span class="zh">缺失／非數</span><p>NA 是缺值；NaN 是算不出來的數。</p></div>
+          <div class="g-item"><span class="en">assignment</span><span class="zh">指定</span><p><code>&lt;-</code> 或 <code>=</code> 把值貼上名字。</p></div>
+          <div class="g-item"><span class="en">vector</span><span class="zh">向量</span><p>同一型別的序列。</p></div>
+          <div class="g-item"><span class="en">recycling</span><span class="zh">回收對齊</span><p>短向量重複使用以配合長向量。</p></div>
+          <div class="g-item"><span class="en">indexing</span><span class="zh">索引</span><p>用 <code>[]</code> 依位置、邏輯或名字取值。</p></div>
+          <div class="g-item"><span class="en">array</span><span class="zh">陣列</span><p>多維向量，column-major。</p></div>
+          <div class="g-item"><span class="en">matrix</span><span class="zh">矩陣</span><p>二維陣列，有 <code>%*%</code>。</p></div>
+          <div class="g-item"><span class="en">list</span><span class="zh">串列</span><p>可混型；<code>[[ ]]</code> 拆盒，<code>[ ]</code> 切段。</p></div>
+          <div class="g-item"><span class="en">data.frame</span><span class="zh">資料框</span><p>列是個案、欄是變數的統計表。</p></div>
+          <div class="g-item"><span class="en">modulo</span><span class="zh">取餘數</span><p>運算子 <code>%%</code>。</p></div>
+          <div class="g-item"><span class="en">integer division</span><span class="zh">整數除法</span><p>運算子 <code>%/%</code>。</p></div>
+          <div class="g-item"><span class="en">indexing</span><span class="zh">三種索引</span><p>整數、布林、名稱；對 vector / matrix / list / data.frame 通用。</p></div>
+          <div class="g-item"><span class="en">on-the-fly</span><span class="zh">現算現用</span><p>當場用比較做出面具，例如 <code>x[x &gt; 0]</code>。</p></div>
+          <div class="g-item"><span class="en">control flow</span><span class="zh">流程控制</span><p><code>if</code>、<code>else if</code>、<code>else</code>、<code>ifelse()</code>、<code>switch()</code>。</p></div>
+          <div class="g-item"><span class="en">iteration / loop</span><span class="zh">迭代／迴圈</span><p><code>for()</code>、<code>while()</code>、<code>repeat</code>、<code>break</code>。</p></div>
+          <div class="g-item"><span class="en">counter</span><span class="zh">計數器</span><p><code>for (i in 1:n)</code> 裡那個 <code>i</code>；也可以是字串。</p></div>
+          <div class="g-item"><span class="en">preallocation</span><span class="zh">預先配置</span><p>先 <code>vector(length=, mode=)</code> 再填，比反覆 <code>c()</code> 快。</p></div>
+          <div class="g-item"><span class="en">vectorization</span><span class="zh">向量化</span><p>一次對整條向量運算，例如 <code>a + b</code>、<code>log(1:6)</code>。</p></div>
+          <div class="g-item"><span class="en">lazy evaluation</span><span class="zh">懶惰求值</span><p><code>&amp;&amp;</code> 與 <code>||</code> 左邊已能決定就不算右邊。</p></div>
+          <div class="g-item"><span class="en">[[ ]] vs [ ]</span><span class="zh">拆盒對切段</span><p>雙括號拿出 list 裡面的物件；單括號留下子 list。</p></div>
+        </div>
+      </section>
+
+      <section class="mod" id="quiz">
+        <h2><span class="no">PART F · UNIT F2</span>自我檢測 · 20 題（請先不要翻上面）</h2>
+        <div class="q" data-q="q1">
+          <p><b>1.</b> 螢幕出現 <code>## [1] 10</code>，你應該？</p>
+          <label><input type="radio" name="q1" value="a"> 把整行含 ## 一起打進 Console</label>
+          <label><input type="radio" name="q1" value="b"> 只打指令本身；## 那行是 R 印出的結果</label>
+          <label><input type="radio" name="q1" value="c"> 表示程式錯誤</label>
+          <label><input type="radio" name="q1" value="d"> 表示這是註解，R 會忽略答案</label>
+        </div>
+        <div class="q" data-q="q2">
+          <p><b>2.</b> <code>typeof(6)</code> 在課堂裡是？</p>
+          <label><input type="radio" name="q2" value="a"> "integer"</label>
+          <label><input type="radio" name="q2" value="b"> "character"</label>
+          <label><input type="radio" name="q2" value="c"> "double"</label>
+          <label><input type="radio" name="q2" value="d"> "logical"</label>
+        </div>
+        <div class="q" data-q="q3">
+          <p><b>3.</b> 要問「6 是否等於 5」，應寫：</p>
+          <label><input type="radio" name="q3" value="a"> <code>6 == 5</code></label>
+          <label><input type="radio" name="q3" value="b"> <code>6 = 5</code></label>
+          <label><input type="radio" name="q3" value="c"> <code>6 === 5</code></label>
+          <label><input type="radio" name="q3" value="d"> <code>6 <- 5</code></label>
+        </div>
+        <div class="q" data-q="q4">
+          <p><b>4.</b> <code>6 %/% 4</code> 與 <code>6 %% 4</code> 分別是：</p>
+          <label><input type="radio" name="q4" value="a"> 1.5 與 2</label>
+          <label><input type="radio" name="q4" value="b"> 24 與 2</label>
+          <label><input type="radio" name="q4" value="c"> 2 與 1</label>
+          <label><input type="radio" name="q4" value="d"> 1 與 2</label>
+        </div>
+        <div class="q" data-q="q5">
+          <p><b>5.</b> <code>is.na(7/0)</code> 為什麼是 FALSE？</p>
+          <label><input type="radio" name="q5" value="a"> 因為 7/0 會讓 R 當機</label>
+          <label><input type="radio" name="q5" value="b"> 因為結果是 Inf，不是 NA</label>
+          <label><input type="radio" name="q5" value="c"> 因為 7/0 等於 0</label>
+          <label><input type="radio" name="q5" value="d"> 因為 7/0 等於 NaN</label>
+        </div>
+        <div class="q" data-q="q6">
+          <p><b>6.</b> <code>x = c(7,8,10,45)</code> 則 <code>x[-2]</code> 是？</p>
+          <label><input type="radio" name="q6" value="a"> 8</label>
+          <label><input type="radio" name="q6" value="b"> 錯誤</label>
+          <label><input type="radio" name="q6" value="c"> 7 10 45</label>
+          <label><input type="radio" name="q6" value="d"> −8</label>
+        </div>
+        <div class="q" data-q="q7">
+          <p><b>7.</b> <code>c(7,8,10,45) + c(-7,-8)</code> 用了 recycling，結果第一個數是：</p>
+          <label><input type="radio" name="q7" value="a"> 0</label>
+          <label><input type="radio" name="q7" value="b"> 14</label>
+          <label><input type="radio" name="q7" value="c"> NA</label>
+          <label><input type="radio" name="q7" value="d"> 錯誤，長度不同不能加</label>
+        </div>
+        <div class="q" data-q="q8">
+          <p><b>8.</b> 有 NA 時讓平均仍算得出來，課堂寫法是：</p>
+          <label><input type="radio" name="q8" value="a"> <code>mean(x, NA=FALSE)</code></label>
+          <label><input type="radio" name="q8" value="b"> <code>mean(x, drop=TRUE)</code></label>
+          <label><input type="radio" name="q8" value="c"> <code>mean(na.rm(x))</code></label>
+          <label><input type="radio" name="q8" value="d"> <code>mean(x, na.rm = T)</code></label>
+        </div>
+        <div class="q" data-q="q9">
+          <p><b>9.</b> 矩陣乘法應使用：</p>
+          <label><input type="radio" name="q9" value="a"> <code>A * B</code></label>
+          <label><input type="radio" name="q9" value="b"> <code>A %*% B</code></label>
+          <label><input type="radio" name="q9" value="c"> <code>A ** B</code></label>
+          <label><input type="radio" name="q9" value="d"> <code>A x B</code></label>
+        </div>
+        <div class="q" data-q="q10">
+          <p><b>10.</b> <code>sample1[2]</code> 與 <code>sample1[[2]]</code>：</p>
+          <label><input type="radio" name="q10" value="a"> 完全相同</label>
+          <label><input type="radio" name="q10" value="b"> 單括號比較快所以較好</label>
+          <label><input type="radio" name="q10" value="c"> 單括號仍是 list；雙括號取出裡面的值</label>
+          <label><input type="radio" name="q10" value="d"> 雙括號會刪除第 2 件</label>
+        </div>
+        <div class="q" data-q="q11">
+          <p><b>11.</b> <code>a.df["v1"]</code> 比較接近：</p>
+          <label><input type="radio" name="q11" value="a"> 一個仍帶結構的小 data.frame／list</label>
+          <label><input type="radio" name="q11" value="b"> 純數值 35</label>
+          <label><input type="radio" name="q11" value="c"> 矩陣</label>
+          <label><input type="radio" name="q11" value="d"> 函數</label>
+        </div>
+        <div class="q" data-q="q12">
+          <p><b>12.</b> <code>rbind(a.df, c(3,4,6))</code> 的風險是：</p>
+          <label><input type="radio" name="q12" value="a"> 列數變少</label>
+          <label><input type="radio" name="q12" value="b"> R 會刪除 logicals 欄</label>
+          <label><input type="radio" name="q12" value="c"> 一定報錯</label>
+          <label><input type="radio" name="q12" value="d"> 強迫轉型，TRUE/FALSE 可能變成 1/0</label>
+        </div>
+        <div class="q" data-q="q13">
+          <p><b>13.</b> 要去掉 <code>x.vec</code> 的第 3 到第 5 個，最穩妥的寫法是：</p>
+          <label><input type="radio" name="q13" value="a"> <code>x.vec[-3:5]</code></label>
+          <label><input type="radio" name="q13" value="b"> <code>x.vec[-(3:5)]</code></label>
+          <label><input type="radio" name="q13" value="c"> <code>x.vec[3:5]</code></label>
+          <label><input type="radio" name="q13" value="d"> <code>x.vec[[3:5]]</code></label>
+        </div>
+        <div class="q" data-q="q14">
+          <p><b>14.</b> <code>x.list[3]</code> 與 <code>x.list[[3]]</code> 的差別是：</p>
+          <label><input type="radio" name="q14" value="a"> 完全相同</label>
+          <label><input type="radio" name="q14" value="b"> 單括號仍是 list；雙括號拿出裡面的值</label>
+          <label><input type="radio" name="q14" value="c"> 雙括號會刪掉第 3 格</label>
+          <label><input type="radio" name="q14" value="d"> 單括號比較快所以較好</label>
+        </div>
+        <div class="q" data-q="q15">
+          <p><b>15.</b> 要對一排數字各做一次「正就 A、否則 B」，應使用：</p>
+          <label><input type="radio" name="q15" value="a"> <code>if (x &gt; 0) "A" else "B"</code></label>
+          <label><input type="radio" name="q15" value="b"> <code>ifelse(x &gt; 0, "A", "B")</code></label>
+          <label><input type="radio" name="q15" value="c"> <code>switch(x &gt; 0, "A", "B")</code></label>
+          <label><input type="radio" name="q15" value="d"> <code>for (x &gt; 0)</code></label>
+        </div>
+        <div class="q" data-q="q16">
+          <p><b>16.</b> 從向量裡篩「同時 ≥ −0.5 且 ≤ 0.5」應使用：</p>
+          <label><input type="radio" name="q16" value="a"> <code>&amp;&amp;</code>，因為只要一個 TRUE/FALSE</label>
+          <label><input type="radio" name="q16" value="b"> <code>&amp;</code>，因為要逐元素做面具</label>
+          <label><input type="radio" name="q16" value="c"> <code>||</code></label>
+          <label><input type="radio" name="q16" value="d"> <code>==</code></label>
+        </div>
+        <div class="q" data-q="q17">
+          <p><b>17.</b> <code>(0 &gt; 0) &amp;&amp; (ThisVariableIsNotDefined == 0)</code> 為什麼是 FALSE 而不是報錯？</p>
+          <label><input type="radio" name="q17" value="a"> 因為未定義變數預設是 0</label>
+          <label><input type="radio" name="q17" value="b"> 因為 <code>&amp;&amp;</code> 懶惰：左邊已是 FALSE，右邊不算</label>
+          <label><input type="radio" name="q17" value="c"> 因為 R 會自動創造該變數</label>
+          <label><input type="radio" name="q17" value="d"> 因為 <code>&amp;&amp;</code> 與 <code>&amp;</code> 完全相同</label>
+        </div>
+        <div class="q" data-q="q18">
+          <p><b>18.</b> 事先知道要走 1 到 n，較自然的迴圈是：</p>
+          <label><input type="radio" name="q18" value="a"> <code>while (TRUE)</code></label>
+          <label><input type="radio" name="q18" value="b"> <code>repeat</code></label>
+          <label><input type="radio" name="q18" value="c"> <code>for (i in 1:n)</code></label>
+          <label><input type="radio" name="q18" value="d"> <code>switch()</code></label>
+        </div>
+        <div class="q" data-q="q19">
+          <p><b>19.</b> 課堂用 <code>for</code> 填 <code>log.vec</code>，同一件事的向量化寫法是：</p>
+          <label><input type="radio" name="q19" value="a"> <code>log(1:10)</code></label>
+          <label><input type="radio" name="q19" value="b"> <code>for (log in 1:10)</code></label>
+          <label><input type="radio" name="q19" value="c"> <code>repeat log(i)</code></label>
+          <label><input type="radio" name="q19" value="d"> <code>ifelse(log, 1, 10)</code></label>
+        </div>
+        <div class="q" data-q="q20">
+          <p><b>20.</b> <code>for + break</code> 那題裡，<code>log.vec</code> 後面三格是 0，原因是：</p>
+          <label><input type="radio" name="q20" value="a"> <code>log(8)</code>、<code>log(9)</code>、<code>log(10)</code> 剛好等於 0</label>
+          <label><input type="radio" name="q20" value="b"> R 自動把沒跑到的格子填 0</label>
+          <label><input type="radio" name="q20" value="c"> 預先 <code>vector(..., mode="numeric")</code> 填了 0，break 後沒寫入</label>
+          <label><input type="radio" name="q20" value="d"> <code>cat()</code> 會把後面清成 0</label>
+        </div>
+        <button class="btn" id="grade-quiz" type="button">批改測驗</button>
+        <p class="scoreboard" id="score"></p>
+      </section>
+
+      <p class="footer">根據 BIOS5801 Introduction（64 頁）與 Iteration（37 頁）（Mingxuan Cai）整理的私人學習本。請在 RStudio Console 親手打過每一段可複製指令。程式碼維持課堂原文；解說為繁體中文。R 輸出已對照本機 R 4.6.1 核對。</p>
+    </main>
+  </div>
+  <script>
+window.BIOS5801_T2S = {"phrases":[["無限迴圈","无限循环"],["巢狀迴圈","嵌套循环"],["迴圈結構","循环结构"],["迴圈本體","循环本体"],["迴圈裡","循环里"],["寫迴圈","写循环"],["用迴圈","用循环"],["的迴圈","的循环"],["迴圈","循环"],["懶惰求值","懒惰求值"],["懶惰運算","懒惰运算"],["懶惰","懒惰"],["續行提示","续行提示"],["現算現用","现算现用"],["預先配置","预先配置"],["一份分析物件裡同時放模型","一份分析对象里同时放模型"],["你螢幕上的數字不會跟投影","你屏幕上的数字不会跟投影"],["依你寫的順序把引數接成向","依你写的顺序把参数接成向"],["因為浮點數無法用有限位元","因为浮点数无法用有限比特"],["或用底下那條向量的第幾個","或用底下那条矢量的第几个"],["把幾乎所有數字都當成向量","把几乎所有数字都当成矢量"],["把相關資料值組成一個物件","把相关数据值组成一个对象"],["會列出你現在擁有的變數名","会列出你现在拥有的变量名"],["有了名字就可以用文字當座","有了名字就可以用文本当座"],["短向量重複使用以配合長向","短矢量重复使用以配合长向"],["程式應由有意義的變數名組","程序应由有意义的变量名组"],["變數住在目前這個工作空間","变量住在目前这个工作空间"],["資料結構把相關值捆在一起","数据结构把相关值捆在一起"],["轉成文字再轉回來會丟一點","转成文本再转回来会丢一点"],["除了回傳值以外對外界的改","除了返回值以外对外界的改"],["頁投影片整理的私人學習本","页投视频整理的私人学习本"],["兩個同形狀陣列逐格運算","两个同形状数组逐格运算"],["只排序名字那條文字向量","只排序名字那条文本矢量"],["很多函數直接吃整條向量","很多函数直接吃整条矢量"],["比較運算子與邏輯運算子","比较运算符与逻辑运算符"],["產生從左到右的整數序列","产生从左到右的整数串行"],["自己造變數用指定運算子","自己造变量用指定运算符"],["這是統計計算的核心觀念","这是统计计算的内核观念"],["不是函數呼叫的圓括號","不是函数调用的圆括号"],["但每一欄自己仍是向量","但每一栏自己仍是矢量"],["內建變數也可以當引數","内置变量也可以当参数"],["小數相減會有位元誤差","小数相减会有比特误差"],["就把它當底下那條向量","就把它当底下那条矢量"],["從機率分配抽隨機樣本","从几率分配抽随机样本"],["整個物件是否完全同一","整个对象是否完全同一"],["裡一般數字的預設型別","里一般数字的默认类型"],["這對資料分析非常重要","这对数据分析非常重要"],["這就是真實專案的樣子","这就是真实项目的样子"],["丟一個普通向量進去","丢一个普通矢量进去"],["作用在向量上的函數","作用在矢量上的函数"],["先做一個空向量再填","先做一个空矢量再填"],["函數吐出的輸出物件","函数吐出的输出对象"],["向量要求全部同一型","矢量要求全部同一型"],["投影片假設你已打開","投视频假设你已打开"],["比較運算子也是二元","比较运算符也是二元"],["程式碼維持課堂原文","代码维持课堂原文"],["算術運算子對向量是","算术运算符对矢量是"],["組合函數去操作資料","组合函数去操作数据"],["給向量加上多維形狀","给矢量加上多维形状"],["螢幕印出的那個物件","屏幕印出的那个对象"],["語言的資料分析工具","语言的数据分析工具"],["這是教學文件的慣例","这是教学文档的惯例"],["一樣長的兩個向量","一样长的两个矢量"],["也可以矩陣乘向量","也可以矩阵乘矢量"],["可以混裝不同型別","可以混装不同类型"],["執行加法這台機器","运行加法这台机器"],["寫程式不是背單字","写程序不是背单字"],["強迫結果仍是陣列","强迫结果仍是数组"],["整條向量相不相等","整条矢量相不相等"],["欄是變數的統計表","栏是变量的统计表"],["短向量對齊長向量","短矢量对齐长矢量"],["空的邏輯向量全是","空的逻辑矢量全是"],["一筆個案的欄位","一笔个案的字段"],["三格分別是文字","三格分别是文本"],["例如把變數改掉","例如把变量改掉"],["做向量元素的且","做矢量元素的且"],["前三種得到向量","前三种得到矢量"],["同一型別的序列","同一类型的串行"],["向量的多維推廣","矢量的多维推广"],["搜尋英文或中文","搜索英文或中文"],["會刪掉那個元件","会删掉那个组件"],["會混到不同型別","会混到不同类型"],["物件可以有名字","对象可以有名字"],["程式長什麼樣子","程序长什么样子"],["處理資料的機器","处理数据的机器"],["資訊的最小單位","信息的最小单位"],["輯向量拿去相加","辑矢量拿去相加"],["這個值貼上標籤","这个值粘贴标签"],["陣列專用的運算","数组专用的运算"],["除了回傳值以外","除了返回值以外"],["預設存成浮點數","默认存成浮点数"],["也可以是向量","也可以是矢量"],["個元件的標號","个组件的标号"],["右邊一個物件","右边一个对象"],["左邊一個物件","左边一个对象"],["幫資料取名字","帮数据取名字"],["得到新的資料","得到新的数据"],["把值貼上名字","把值粘贴名字"],["改用命名變數","改用命名变量"],["是純數字向量","是纯数字矢量"],["有些是內建的","有些是内置的"],["有名字的引數","有名字的参数"],["欄是數字向量","栏是数字矢量"],["欄是邏輯向量","栏是逻辑矢量"],["用來指定變數","用来指定变量"],["用名字找資料","用名字找数据"],["的型別是什麼","的类型是什么"],["程式碼為標準","代码为标准"],["維陣列的特化","维数组的特化"],["若不認識陣列","若不认识数组"],["表示程式錯誤","表示程序错误"],["課堂投影片把","课堂投视频把"],["資料裡有一個","数据里有一个"],["一元運算子","一元运算符"],["不是純向量","不是纯矢量"],["二元運算子","二元运算符"],["兩個引數是","两个参数是"],["只打變數名","只打变量名"],["吃邏輯向量","吃逻辑矢量"],["回傳單個數","返回单个数"],["回傳新向量","返回新矢量"],["指定運算子","赋值运算符"],["是一串字元","是一串字符"],["的邏輯向量","的逻辑矢量"],["程式初學者","程序初学者"],["經典資料表","经典数据表"],["與向量相同","与矢量相同"],["請手動選取","请手动选取"],["資料或函數","数据或函数"],["運算子運算","运算符运算"],["陣列不再被","数组不再被"],["二維陣列","二维数组"],["兩個引數","两个参数"],["函數呼叫","函数调用"],["原子資料","原子数据"],["同一型別","同一类型"],["向量不是","矢量不是"],["向量函數","矢量函数"],["向量運算","矢量运算"],["回傳位置","返回位置"],["回到頂部","回到顶部"],["型別要對","类型要对"],["基本型別","基本类型"],["多維向量","多维矢量"],["巢狀結構","嵌套结构"],["工作空間","工作空间"],["成功機率","成功几率"],["批改測驗","批改测验"],["投影片第","投视频第"],["普通向量","普通矢量"],["檢查型別","检查类型"],["欄是變數","栏是变量"],["當成向量","当成矢量"],["程式語言","编程语言"],["自我檢測","自我检测"],["螢幕上的","屏幕上的"],["螢幕出現","屏幕出现"],["說明文件","说明文档"],["課程資訊","课程信息"],["請執行它","请运行它"],["變成文字","变成文本"],["資料型別","数据类型"],["資料物件","数据对象"],["資料結構","数据结构"],["轉換型別","转换类型"],["隨機向量","随机矢量"],["主控台","控制台"],["位元組","字节"],["個引數","个参数"],["剪貼簿","剪贴板"],["只複製","只拷贝"],["可複製","可拷贝"],["向量是","矢量是"],["回传值","返回值"],["回傳值","返回值"],["學習本","学习读本"],["寫程式","写程序"],["已複製","已复制"],["成向量","成矢量"],["投影片","投视频"],["操作符","运算符"],["是文字","是文本"],["浮點數","浮点数"],["的向量","的矢量"],["程式碼","代码"],["空字串","空字符串"],["記憶體","内存"],["詞彙表","词汇表"],["資料夾","文件夹"],["資料框","数据框"],["運算元","操作数"],["運算子","运算符"],["邏輯值","逻辑值"],["預設值","默认值"],["預設會","默认会"],["串列","列表"],["位元","比特"],["函數","函数"],["向量","矢量"],["回传","返回"],["回傳","返回"],["型別","类型"],["字串","字符串"],["字元","字符"],["定義","定义"],["專題","专题"],["布林","布尔"],["建立","创建"],["引數","参数"],["整數","整数"],["文字","文本"],["新增","添加"],["檔案","文件"],["步驟","步骤"],["注釋","注释"],["滑鼠","鼠标"],["物件","对象"],["相容","兼容"],["硬體","硬件"],["程式","程序"],["範例","范例"],["結構","结构"],["網路","网络"],["缺省","默认"],["習題","习题"],["螢幕","屏幕"],["複製","复制"],["要點","要点"],["視窗","窗口"],["語法","语法"],["說明","说明"],["課堂","课堂"],["講義","讲义"],["變數","变量"],["資料","数据"],["資訊","信息"],["軟體","软件"],["輸出","输出"],["遞迴","递归"],["陣列","数组"],["除錯","调试"],["預設","默认"],["題目","题目"]],"chars":{"顯":"显","設":"设","濾":"滤","稱":"称","螢":"萤","進":"进","樣":"样","醜":"丑","邊":"边","別":"别","為":"为","問":"问","還":"还","從":"从","簡":"简","內":"内","業":"业","譯":"译","認":"认","計":"计","帶":"带","麼":"么","鑰":"钥","據":"据","裡":"里","雙":"双","總":"总","腦":"脑","轉":"转","種":"种","碼":"码","電":"电","課":"课","廣":"广","個":"个","隨":"随","對":"对","筆":"笔","區":"区","類":"类","機":"机","處":"处","讓":"让","識":"识","條":"条","沒":"没","東":"东","號":"号","說":"说","預":"预","範":"范","單":"单","續":"续","項":"项","選":"选","數":"数","準":"准","產":"产","絕":"绝","須":"须","輸":"输","蓋":"盖","驗":"验","畫":"画","現":"现","學":"学","輯":"辑","習":"习","資":"资","態":"态","複":"复","書":"书","會":"会","題":"题","執":"执","綠":"绿","請":"请","傳":"传","該":"该","訊":"讯","時":"时","點":"点","換":"换","辦":"办","試":"试","擁":"拥","製":"制","開":"开","親":"亲","張":"张","維":"维","觀":"观","邏":"逻","陣":"阵","刪":"删","塊":"块","經":"经","慣":"惯","丟":"丢","後":"后","講":"讲","舊":"旧","讀":"读","話":"话","狀":"状","貼":"贴","頭":"头","勻":"匀","幫":"帮","標":"标","長":"长","紅":"红","順":"顺","語":"语","穩":"稳","風":"风","結":"结","價":"价","軒":"轩","線":"线","給":"给","組":"组","記":"记","覺":"觉","這":"这","無":"无","險":"险","測":"测","層":"层","彙":"汇","變":"变","訣":"诀","詞":"词","於":"于","師":"师","關":"关","圖":"图","圓":"圆","議":"议","銅":"铜","實":"实","統":"统","環":"环","確":"确","綜":"综","減":"减","錯":"错","運":"运","連":"连","門":"门","報":"报","義":"义","誤":"误","嗎":"吗","來":"来","當":"当","釋":"释","訴":"诉","裝":"装","檢":"检","與":"与","們":"们","頁":"页","幾":"几","餘":"余","縮":"缩","兩":"两","體":"体","強":"强","專":"专","則":"则","編":"编","導":"导","純":"纯","註":"注","擇":"择","論":"论","欄":"栏","寫":"写","籤":"签","過":"过","約":"约","鍵":"键","間":"间","許":"许","亂":"乱","頂":"顶","應":"应","齊":"齐","術":"术","較":"较","構":"构","懶":"懒"}};
+
+  </script>
+  <script>
+(function () {
+  const navLinks = [...document.querySelectorAll(".nav a")];
+  const sections = navLinks
+    .map((a) => document.querySelector(a.getAttribute("href")))
+    .filter(Boolean);
+
+  const setActive = () => {
+    const y = window.scrollY + 90;
+    let current = sections[0];
+    for (const s of sections) if (s.offsetTop <= y) current = s;
+    if (!current) return;
+    navLinks.forEach((a) => {
+      a.classList.toggle("active", a.getAttribute("href") === "#" + current.id);
+    });
+  };
+  window.addEventListener("scroll", setActive, { passive: true });
+  setActive();
+
+  const escapeHtml = (s) =>
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  const highlightR = (src) => {
+    const parts = [];
+    const re = /("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|#.*/g;
+    let last = 0;
+    let m;
+    while ((m = re.exec(src))) {
+      if (m.index > last) parts.push(["code", src.slice(last, m.index)]);
+      parts.push([m[0][0] === "#" ? "com" : "str", m[0]]);
+      last = m.index + m[0].length;
+    }
+    if (last < src.length) parts.push(["code", src.slice(last)]);
+
+    const colorOps = (html) =>
+      html
+        .replace(/&lt;-/g, '<span class="tok-op">&lt;-</span>')
+        .replace(/&lt;=/g, '<span class="tok-op">&lt;=</span>')
+        .replace(/&gt;=/g, '<span class="tok-op">&gt;=</span>')
+        .replace(/==/g, '<span class="tok-op">==</span>')
+        .replace(/!=/g, '<span class="tok-op">!=</span>')
+        .replace(/&lt;/g, '<span class="tok-op">&lt;</span>')
+        .replace(/&gt;/g, '<span class="tok-op">&gt;</span>')
+        .replace(/&amp;&amp;/g, '<span class="tok-op">&amp;&amp;</span>')
+        .replace(/\|\|/g, '<span class="tok-op">||</span>')
+        .replace(/&amp;/g, '<span class="tok-op">&amp;</span>')
+        .replace(/(\s)\|(?=\s)/g, '$1<span class="tok-op">|</span>')
+        .replace(/%\*%/g, '<span class="tok-op">%*%</span>')
+        .replace(/%\/%/g, '<span class="tok-op">%/%</span>')
+        .replace(/%%/g, '<span class="tok-op">%%</span>');
+
+    return parts
+      .map(([kind, text]) => {
+        if (kind === "str") return '<span class="tok-str">' + escapeHtml(text) + "</span>";
+        if (kind === "com") return '<span class="tok-com">' + escapeHtml(text) + "</span>";
+        let s = escapeHtml(text);
+        s = s.replace(
+          /\b(TRUE|FALSE|NULL|NA|NaN|Inf|if|else|for|in|while|function|repeat|next|break)\b/g,
+          '<span class="tok-kw">$1</span>'
+        );
+        s = s.replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="tok-num">$1</span>');
+        s = s.replace(
+          /\b([A-Za-z.][A-Za-z0-9._]*)(?=\()/g,
+          '<span class="tok-fn">$1</span>'
+        );
+        s = colorOps(s);
+        return s;
+      })
+      .join("");
+  };
+
+  document.querySelectorAll(".snippet pre code").forEach((el) => {
+    const src = el.textContent.replace(/\u00a0/g, " ");
+    el.dataset.src = src;
+    el.innerHTML = highlightR(src);
+  });
+
+  document.querySelectorAll(".copy").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const code = btn.closest(".snippet")?.querySelector("pre code");
+      const text = code?.dataset.src || code?.innerText || "";
+      try {
+        await navigator.clipboard.writeText(text);
+        const t = window.biosT || ((s) => s);
+        btn.textContent = t("已複製");
+        setTimeout(() => (btn.textContent = t("複製")), 1200);
+      } catch (e) {
+        const t = window.biosT || ((s) => s);
+        btn.textContent = t("請手動選取");
+      }
+    });
+  });
+
+  const qSearch = document.getElementById("glossary-search");
+  if (qSearch) {
+    qSearch.addEventListener("input", () => {
+      const q = qSearch.value.trim().toLowerCase();
+      document.querySelectorAll(".g-item").forEach((el) => {
+        el.style.display = el.textContent.toLowerCase().includes(q) ? "" : "none";
+      });
+    });
+  }
+
+  const answers = {
+    q1: "b",
+    q2: "c",
+    q3: "a",
+    q4: "d",
+    q5: "b",
+    q6: "c",
+    q7: "a",
+    q8: "d",
+    q9: "b",
+    q10: "c",
+    q11: "a",
+    q12: "d",
+    q13: "b",
+    q14: "b",
+    q15: "b",
+    q16: "b",
+    q17: "b",
+    q18: "c",
+    q19: "a",
+    q20: "c",
+  };
+
+  document.getElementById("grade-quiz")?.addEventListener("click", () => {
+    let score = 0;
+    Object.entries(answers).forEach(([name, key]) => {
+      const q = document.querySelector(`[data-q="${name}"]`);
+      if (!q) return;
+      q.querySelectorAll("label").forEach((lab) => {
+        lab.classList.remove("ok", "bad");
+        const input = lab.querySelector("input");
+        if (input.value === key) lab.classList.add("ok");
+        if (input.checked && input.value !== key) lab.classList.add("bad");
+      });
+      const chosen = q.querySelector("input:checked");
+      if (chosen && chosen.value === key) score += 1;
+    });
+    const board = document.getElementById("score");
+    const t = window.biosT || ((s) => s);
+    board.textContent = `${t("得分：")}${score} / ${Object.keys(answers).length}`;
+    board.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+
+  document.getElementById("to-top")?.addEventListener("click", () =>
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  );
+})();
+
+  </script>
+  <script>
+(function () {
+  const dict = window.BIOS5801_T2S;
+  if (!dict) return;
+
+  const phrases = dict.phrases || [];
+  const chars = dict.chars || {};
+  const KEY = "bios5801-lang";
+  const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "TEXTAREA", "CODE", "PRE", "KBD", "SAMP"]);
+
+  const t2s = (s) => {
+    if (!s) return s;
+    let out = s;
+    for (let i = 0; i < phrases.length; i++) {
+      const pair = phrases[i];
+      if (out.indexOf(pair[0]) !== -1) out = out.split(pair[0]).join(pair[1]);
+    }
+    let buf = "";
+    for (const ch of out) buf += chars[ch] || ch;
+    return buf;
+  };
+
+  window.biosT = (hant) =>
+    document.documentElement.lang === "zh-Hans" ? t2s(hant) : hant;
+
+  const snapshots = [];
+
+  const shouldSkip = (el) => {
+    if (!el) return true;
+    if (el.closest && el.closest("[data-no-i18n]")) return true;
+    if (SKIP_TAGS.has(el.tagName)) return true;
+    if (el.closest && el.closest("pre, code, script, style, kbd, samp")) return true;
+    return false;
+  };
+
+  const walkText = (root) => {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        const p = node.parentElement;
+        if (!p || shouldSkip(p)) return NodeFilter.FILTER_REJECT;
+        if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+    const nodes = [];
+    let n;
+    while ((n = walker.nextNode())) nodes.push(n);
+    nodes.forEach((node) => {
+      snapshots.push({
+        type: "text",
+        node,
+        original: node.nodeValue,
+      });
+    });
+  };
+
+  const ATTRS = ["data-zh", "placeholder", "title", "aria-label", "alt"];
+  document.querySelectorAll("body *").forEach((el) => {
+    if (shouldSkip(el)) return;
+    ATTRS.forEach((name) => {
+      if (!el.hasAttribute(name)) return;
+      snapshots.push({
+        type: "attr",
+        node: el,
+        name,
+        original: el.getAttribute(name),
+      });
+    });
+  });
+  snapshots.push({
+    type: "title",
+    original: document.title,
+  });
+  walkText(document.body);
+
+  const apply = (lang) => {
+    const hans = lang === "zh-Hans";
+    document.documentElement.lang = hans ? "zh-Hans" : "zh-Hant";
+    document.documentElement.classList.toggle("lang-hans", hans);
+    snapshots.forEach((item) => {
+      const next = hans ? t2s(item.original) : item.original;
+      if (item.type === "text") item.node.nodeValue = next;
+      else if (item.type === "attr") item.node.setAttribute(item.name, next);
+      else if (item.type === "title") document.title = next;
+    });
+    document.getElementById("lang-hant")?.setAttribute("aria-pressed", hans ? "false" : "true");
+    document.getElementById("lang-hans")?.setAttribute("aria-pressed", hans ? "true" : "false");
+    try {
+      localStorage.setItem(KEY, lang);
+    } catch (e) {}
+  };
+
+  document.getElementById("lang-hant")?.addEventListener("click", () => apply("zh-Hant"));
+  document.getElementById("lang-hans")?.addEventListener("click", () => apply("zh-Hans"));
+
+  let initial = "zh-Hant";
+  try {
+    const saved = localStorage.getItem(KEY);
+    if (saved === "zh-Hans" || saved === "zh-Hant") initial = saved;
+  } catch (e) {}
+  apply(initial);
+})();
+
+  </script>
+</body>
+</html>
